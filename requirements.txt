@@ -1,0 +1,4 @@
+flask~=1.0
+flask-login~=0.4
+flask-sqlalchemy~=2.3
+flask-user~=1.0
