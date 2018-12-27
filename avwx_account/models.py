@@ -5,30 +5,34 @@ from flask_user import UserManager, UserMixin
 from avwx_account import db
 
 class User(db.Model, UserMixin):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
 
-    # User authentication information. The collation='NOCASE' is required
-    # to search case insensitively when USER_IFIND_MODE is 'nocase_collation'.
-    email = db.Column(db.String(255, collation='NOCASE'), nullable=False, unique=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
     email_confirmed_at = db.Column(db.DateTime())
     password = db.Column(db.String(255), nullable=False, server_default='')
 
     # User information
-    first_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
-    last_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
+    first_name = db.Column(db.String(100), nullable=False, server_default='')
+    last_name = db.Column(db.String(100), nullable=False, server_default='')
+    company = db.Column(db.String(100), nullable=True, server_default='')
 
     # Define the relationship to Role via UserRoles
-    roles = db.relationship('Role', secondary='user_roles')
+    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
 
 class Role(db.Model):
-    __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+    description = db.Column(db.String(255))
 
-class UserRoles(db.Model):
-    __tablename__ = 'user_roles'
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+    def __str__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+roles_users = db.Table(
+    'user_roles',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
+)

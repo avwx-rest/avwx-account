@@ -1,4 +1,7 @@
 flask~=1.0
 flask-login~=0.4
+flask-migrate~=2.3
 flask-sqlalchemy~=2.3
 flask-user~=1.0
+psycopg2-binary~=2.7
+python-dotenv~=0.10

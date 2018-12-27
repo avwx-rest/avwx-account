@@ -2,26 +2,21 @@
 avwx_account.config - App config vars
 """
 
-from os import environ
-
 # Flask Settings
-SECRET_KEY = environ.get('SECRET_KEY')
 
 # Flask-SQLAlchemy settings
-SQLALCHEMY_DATABASE_URI = environ.get('DATABASE_URI', 'sqlite:///test_app.sqlite')
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# Flask-Security settings
+SECURITY_PASSWORD_HASH='pbkdf2_sha512'
 
 # Flask-Mail SMTP server settings
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 465
-MAIL_USE_SSL = True
-MAIL_USE_TLS = False
-MAIL_USERNAME = 'michael@avwx.rest'
-MAIL_PASSWORD = 'super secret password'
-MAIL_DEFAULT_SENDER = '"AVWX" <noreply@avwx.rest>'
+MAIL_SERVER = 'smtp.mailgun.org'
+MAIL_PORT = 587
 
 # Flask-User settings
-USER_APP_NAME = "AVWX" # Shown in and email templates and page footers
-USER_ENABLE_EMAIL = True # Enable email authentication
-USER_ENABLE_USERNAME = False # Disable username authentication
+USER_APP_NAME = "AVWX"
+USER_ENABLE_EMAIL = True
+USER_ENABLE_USERNAME = False
 USER_EMAIL_SENDER_NAME = USER_APP_NAME
 USER_EMAIL_SENDER_EMAIL = "noreply@avwx.rest"
