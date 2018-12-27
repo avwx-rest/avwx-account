@@ -1,4 +1,5 @@
 """
+avwx_account.models - Manages database models
 """
 
 from flask_user import UserManager, UserMixin
@@ -20,6 +21,12 @@ class User(db.Model, UserMixin):
     # Define the relationship to Role via UserRoles
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
 
+    def __str__(self):
+        return self.email
+
+    def __hash__(self):
+        return hash(self.email)
+
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
@@ -31,7 +38,7 @@ class Role(db.Model):
     def __hash__(self):
         return hash(self.name)
 
-roles_users = db.Table(
+user_roles = db.Table(
     'user_roles',
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
