@@ -24,3 +24,18 @@ def home_page():
 @login_required
 def member_page():
     return render_template('members.html')
+
+@app.route('/token')
+@login_required
+def generate_token():
+    current_user.new_token()
+    return current_user.apitoken
+
+@app.route('/token/<token>')
+def verify_token(token):
+    user = User.query.filter_by(apitoken=token).first()
+    if user:
+        if user.active_token:
+            return 'Valid token'
+        return 'Token is not active'
+    return 'Invalid token'

@@ -2,6 +2,8 @@
 avwx_account.models - Manages database models
 """
 
+# stdlib
+from secrets import token_urlsafe
 from flask_user import UserManager, UserMixin
 from avwx_account import db
 
@@ -18,6 +20,10 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(100), nullable=False, server_default='')
     company = db.Column(db.String(100), nullable=True, server_default='')
 
+    # API and Payment information
+    apitoken = db.Column(db.String(43), nullable=True, server_default='')
+    active_token = db.Column(db.Boolean(), nullable=False, server_default='0')
+
     # Define the relationship to Role via UserRoles
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
 
@@ -26,6 +32,14 @@ class User(db.Model, UserMixin):
 
     def __hash__(self):
         return hash(self.email)
+
+    def new_token(self):
+        """
+        Generate a new API token
+        """
+        self.apitoken = token_urlsafe(32)
+        self.active_token = True
+        db.session.commit()
 
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

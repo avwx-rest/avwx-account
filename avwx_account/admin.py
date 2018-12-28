@@ -27,7 +27,7 @@ class UserAdmin(AuthModel):
     # User update issue:
     # https://github.com/flask-admin/flask-admin/issues/782#issuecomment-421886244
 
-    column_exclude_list = ('password',)
+    column_exclude_list = ('password', 'apitoken',)
     form_excluded_columns = ('password',)
     form_base_class = SecureForm
     column_auto_select_related = True
