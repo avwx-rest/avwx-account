@@ -27,4 +27,4 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
 
-from avwx_account import admin, views
+from avwx_account import admin, user_manager, views
