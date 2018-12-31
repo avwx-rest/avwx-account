@@ -2,7 +2,7 @@
 avwx_account.views - App routing and view logic
 """
 
-from flask import render_template
+from flask import redirect, render_template
 from flask_login import AnonymousUserMixin
 from flask_user import UserManager, login_required, roles_required, current_user
 from avwx_account import app, db
@@ -17,19 +17,19 @@ class Anonymous(AnonymousUserMixin):
 user_manager.anonymous_user = Anonymous
 
 @app.route('/')
-def home_page():
+def home():
     return render_template('index.html')
 
-@app.route('/members')
+@app.route('/manage')
 @login_required
-def member_page():
-    return render_template('members.html')
+def manage():
+    return render_template('manage.html')
 
 @app.route('/token')
 @login_required
 def generate_token():
     current_user.new_token()
-    return current_user.apitoken
+    return redirect('manage')
 
 @app.route('/token/<token>')
 def verify_token(token):

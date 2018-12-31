@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Account Management</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
+            <a href="{{ url_for('user.change_password') }}" class="btn btn-primary" role="button"><i class="fas fa-lock"></i> Change Password</a>
+            <h3>Token</h3>
+            <table>
+                <tr>
+                    <td><b>Active Token:</b></td>
+                    <td>{% if current_user.active_token %}<i class="far fa-check-circle" style="color: green;"></i>{% else %}<i class="far fa-times-circle" style="color: red;"></i>{% endif %}</td>
+                </tr>
+                {% if current_user.active_token %}
+                <tr>
+                    <td><b>API Token:</b></td>
+                    <td>{{ current_user.apitoken }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            <a href="{{ url_for('generate_token') }}" class="btn btn-primary" role="button"><i class="fas fa-key"></i> Refresh Token</a>
+        </div>
+        <div class="col-md-6">
+            <h3>Payment</h3>
+            <p>management</p>
+            <h3>History</h3>
+            <p>payment history</p>
+        </div>
+    </div>
+{% endblock %}

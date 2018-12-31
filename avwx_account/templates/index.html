@@ -2,8 +2,8 @@
 
 {% block content %}
 <h1>Home page</h1>
-<p><a href={{ url_for('home_page') }}>Home Page</a></p>
-<p><a href={{ url_for('member_page') }}>Member Page</a></p>
+<p><a href={{ url_for('home') }}>Home Page</a></p>
+<p><a href={{ url_for('manage') }}>Manage Page</a></p>
 <p><a href={{ url_for('admin.index') }}>Admin Page</a></p>
 <p><a href={{ url_for('user.logout') }}>Sign out</a></p>
 {% endblock %}
