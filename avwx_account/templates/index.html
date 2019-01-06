@@ -2,8 +2,6 @@
 
 {% block content %}
 <h1>Home page</h1>
-<p><a href={{ url_for('home') }}>Home Page</a></p>
-<p><a href={{ url_for('manage') }}>Manage Page</a></p>
+{% include 'include/plans.html' %}
 <p><a href={{ url_for('admin.index') }}>Admin Page</a></p>
-<p><a href={{ url_for('user.logout') }}>Sign out</a></p>
 {% endblock %}

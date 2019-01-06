@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Account Management</h1>
+    <!-- <h1>Account Management</h1> -->
+    {% include 'include/plans.html' %}
+    <br/>
     <div class="row">
         <div class="col-md-6">
             <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
