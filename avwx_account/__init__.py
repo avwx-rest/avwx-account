@@ -19,6 +19,10 @@ for key in (
     'SECURITY_PASSWORD_SALT',
     'MAIL_USERNAME',
     'MAIL_PASSWORD',
+    'STRIPE_PUB_KEY',
+    'STRIPE_SECRET_KEY',
+    'STRIPE_BASIC_ID',
+    'STRIPE_ENTERPRISE_ID',
 ):
     if app.config.get(key) is None:
         app.config[key] = environ.get(key)

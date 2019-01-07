@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block headers %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/plans.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>Home page</h1>
 {% include 'include/plans.html' %}

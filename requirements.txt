@@ -6,3 +6,4 @@ flask-sqlalchemy~=2.3
 flask-user~=1.0
 psycopg2-binary~=2.7
 python-dotenv~=0.10
+stripe~=2.17

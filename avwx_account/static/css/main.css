@@ -1,0 +1,37 @@
+body {
+    background-color: #e1e2e3;
+    color: #335e9e;
+}
+
+nav {
+    background-color: #4f68ae;
+    color: white; padding: 5px;
+}
+
+nav a {
+    color: #fefefe;
+}
+
+nav .col-xs-auto {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.container {
+    background-color: #f5f5f5;
+}
+
+.content {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.btn-primary {
+    background-color: #4f68ae;
+    border-color: #4f68ae;
+}
+
+.btn-primary:hover {
+    background-color: #4d5155;
+    border-color: #4d5155;
+}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Plan Signup</h1>
+<p>You're about to sign up for the {{ plan_tag }} plan for the AVWX REST API. Click the button below to finish</p>
+<form action="/activate/{{ plan_tag }}" method="POST">
+    <script
+        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+        data-key="{{ stripe_key }}"
+        data-image="https://avwx.rest/static/favicons/android-icon-96x96.png"
+        data-name="AVWX"
+        data-description="{{ plan_description }}"
+        data-email="{{ email }}"
+        data-amount="{{ plan_price }}"
+        data-label="Sign Me Up!"
+        data-zip-code="true"
+        data-locale="auto">
+    </script>
+</form>
+{% endblock %}
