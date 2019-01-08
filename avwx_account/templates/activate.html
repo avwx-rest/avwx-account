@@ -3,6 +3,14 @@
 {% block content %}
 <h1>Plan Signup</h1>
 <p>You're about to sign up for the {{ plan_tag }} plan for the AVWX REST API. Click the button below to finish</p>
+{% if config.ENV == 'development' %}
+<p>Since the app is in development: use the following Stripe card numbers and make up the rest:</p>
+<ul>
+    <li>Success: 4242 4242 4242 4242</li>
+    <li>Error: 4000 0000 0000 0002</li>
+</ul>
+<p>Check their <a href="https://stripe.com/docs/testing#cards">documentation</a> for a full list of test credit card numbers</p>
+{% endif %}
 <form action="/activate/{{ plan_tag }}" method="POST">
     <script
         src="https://checkout.stripe.com/checkout.js" class="stripe-button"

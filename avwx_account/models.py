@@ -18,9 +18,11 @@ class User(db.Model, UserMixin):
     # User information
     first_name = db.Column(db.String(100), nullable=False, server_default='')
     last_name = db.Column(db.String(100), nullable=False, server_default='')
-    company = db.Column(db.String(100), nullable=True, server_default='')
 
     # API and Payment information
+    customer_id = db.Column(db.String(32), nullable=True)
+    subscription_id = db.Column(db.String(32), nullable=True)
+    plan = db.Column(db.String(16), nullable=True)
     apitoken = db.Column(db.String(43), nullable=True, server_default='')
     active_token = db.Column(db.Boolean(), nullable=False, server_default='0')
 
@@ -37,9 +39,10 @@ class User(db.Model, UserMixin):
         """
         Generate a new API token
         """
-        self.apitoken = token_urlsafe(32)
-        self.active_token = True
-        db.session.commit()
+        if self.customer_id and self.subscription_id:
+            self.apitoken = token_urlsafe(32)
+            self.active_token = True
+            db.session.commit()
 
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
