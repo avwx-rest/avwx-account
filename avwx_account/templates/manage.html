@@ -5,13 +5,18 @@
 {% endblock %}
 
 {% block content %}
-    <!-- <h1>Account Management</h1> -->
-    {% include 'include/plans.html' %}
-    <br/>
     <div class="row">
-        <div class="col-md-6">
-            <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
-            <a href="{{ url_for('user.change_password') }}" class="btn btn-primary" role="button"><i class="fas fa-lock"></i> Change Password</a>
+        <div class="col-md-4 col-sm-6">
+            <h3>Accout Management</h3>
+            <div class="btn-grid">
+                <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
+                <a href="{{ url_for('user.change_password') }}" class="btn btn-primary" role="button"><i class="fas fa-lock"></i> Change Password</a>
+                {% if plan %}
+                <a href="{{ url_for('cancel') }}" class="btn btn-danger" role="button"><i class="fas fa-ban"></i> Cancel Subscription</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-8 col-sm-6">
             <h3>Token</h3>
             <table>
                 <tr>
@@ -25,13 +30,11 @@
                 </tr>
                 {% endif %}
             </table>
+            {% if plan %}
             <a href="{{ url_for('generate_token') }}" class="btn btn-primary" role="button"><i class="fas fa-key"></i> Refresh Token</a>
-        </div>
-        <div class="col-md-6">
-            <h3>Payment</h3>
-            <p>management</p>
-            <h3>History</h3>
-            <p>payment history</p>
+            {% endif %}
         </div>
     </div>
+    <br/>
+    {% include 'include/plans.html' %}
 {% endblock %}

@@ -44,6 +44,14 @@ class User(db.Model, UserMixin):
             self.active_token = True
             db.session.commit()
 
+    def clear_token(self):
+        """
+        Clears an active token
+        """
+        self.apitoken = None
+        self.active_token = False
+        db.session.commit()
+
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)

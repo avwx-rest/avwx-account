@@ -41,6 +41,7 @@ def new_subscription(plan: str, token: str) -> bool:
         items=[{'plan': PLANS[plan]['id']}]
     )
     current_user.subscription_id = subscription.id
+    current_user.plan = plan
     db.session.commit()
     return True
 
@@ -52,13 +53,16 @@ def change_subscription(plan: str) -> bool:
     if not sid or current_user.plan == plan:
         return False
     subscription = stripe.Subscription.retrieve(sid)
-    stripe.Subscription.modify(sid,
+    subscription.modify(sid,
         cancel_at_period_end=False,
         items=[{
             'id': subscription['items']['data'][0].id,
             'plan': PLANS[plan]['id'],
         }]
     )
+    current_user.subscription_id = subscription.id
+    current_user.plan = plan
+    db.session.commit()
     return True
 
 def cancel_subscription() -> bool:
@@ -70,4 +74,10 @@ def cancel_subscription() -> bool:
         return False
     subscription = stripe.Subscription.retrieve(sid)
     subscription.delete()
+    customer = stripe.Customer.retrieve(current_user.customer_id)
+    customer.delete()
+    current_user.customer_id = None
+    current_user.subscription_id = None
+    current_user.plan = None
+    db.session.commit()
     return True

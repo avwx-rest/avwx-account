@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Plan Signup</h1>
-<p>You're about to sign up for the {{ plan_tag }} plan for the AVWX REST API. Click the button below to finish</p>
+<p>You're about to sign up for the {{ plan_tag }} plan for the AVWX REST API. Click the button below to finish. Your card will be charged after the 14-day free trial has ended.</p>
 {% if config.ENV == 'development' %}
 <p>Since the app is in development: use the following Stripe card numbers and make up the rest:</p>
 <ul>
@@ -19,9 +19,11 @@
         data-name="AVWX"
         data-description="{{ plan_description }}"
         data-email="{{ email }}"
-        data-amount="{{ plan_price }}"
-        data-label="Sign Me Up!"
+        data-amount="{{ stripe_price }}"
+        data-label="Subscribe to AVWX"
+        data-panel-label="Subscribe for ${{ plan_price }}/month"
         data-zip-code="true"
+        data-allow-remember-me="false"
         data-locale="auto">
     </script>
 </form>

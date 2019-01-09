@@ -35,3 +35,29 @@ nav .col-xs-auto {
     background-color: #4d5155;
     border-color: #4d5155;
 }
+
+.btn-disabled {
+    background-color: #4d5155;
+    border-color: #4d5155;
+    color: white;
+}
+
+.btn-disabled:hover {
+    color: white;
+}
+
+.btn-danger {
+    background-color: white;
+    border-color: #BA150C;
+    color: #BA150C;
+}
+
+.btn-danger:hover {
+    background-color: #BA150C;
+    border-color: #BA150C;
+    color: white;
+}
+
+.btn-grid .btn {
+    margin: 2px;
+}
