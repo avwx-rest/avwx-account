@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Delete Account</h1>
+<p>Are you sure you want to delete your account?</p>
+<ul>
+    <li>Any existing subscriptions will be cancelled</li>
+    <li>Your API token will be deleted <b>immediately</b></li>
+</ul>
+<p>Enter your email below to confirm deletion.</p>
+<form action="{{ url_for('delete_account') }}" method="POST">
+    <input type="text" name="email" value="{{ form_email }}">
+    <input class="btn btn-danger" type="submit" value="Yes, delete my account">
+</form>
+{% endblock %}

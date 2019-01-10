@@ -35,14 +35,15 @@ class User(db.Model, UserMixin):
     def __hash__(self):
         return hash(self.email)
 
-    def new_token(self):
+    def new_token(self) -> bool:
         """
         Generate a new API token
         """
         if self.customer_id and self.subscription_id:
             self.apitoken = token_urlsafe(32)
             self.active_token = True
-            db.session.commit()
+            return True
+        return False
 
     def clear_token(self):
         """
@@ -50,7 +51,6 @@ class User(db.Model, UserMixin):
         """
         self.apitoken = None
         self.active_token = False
-        db.session.commit()
 
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

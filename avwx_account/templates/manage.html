@@ -14,6 +14,7 @@
                 {% if plan %}
                 <a href="{{ url_for('cancel') }}" class="btn btn-danger" role="button"><i class="fas fa-ban"></i> Cancel Subscription</a>
                 {% endif %}
+                <a href="{{ url_for('delete_account') }}" class="btn btn-danger" role="button"><i class="far fa-trash-alt"></i> Delete Account</a>
             </div>
         </div>
         <div class="col-md-8 col-sm-6">

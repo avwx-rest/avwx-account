@@ -4,9 +4,9 @@
 <h1>Change Subscription</h1>
 <p>Are you sure you want to {{ change_type }} your plan from {{ old_plan }} to {{ new_plan }}?</p>
 <ul>
-    <li>Your monthly charge will {{ 'increase' if change_type == 'upgrade' else 'decrease' }} to ${{ new_plan_price }}/month</li>
-    <li>Your card will be charged with the new ammount immediately</li>
-    <li>Your API token does not need to be updated</li>
+    <li>Your monthly charge will {{ 'increase' if change_type == 'upgrade' else 'decrease' }} to <b>${{ new_plan_price }}/month</b></li>
+    <li>Your card will be charged with the new ammount <b>immediately</b></li>
+    <li>Your API token <b>does not</b> need to be updated</li>
 </ul>
 <form action="{{ url_for('change', plan=new_plan) }}" method="POST">
     <input class="btn btn-primary" type="submit" value="Change Subscription">

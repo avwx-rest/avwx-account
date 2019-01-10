@@ -2,10 +2,34 @@
 
 {% block headers %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/plans.css') }}">
+<style>
+.faq > div {
+    padding: 0px 50px;
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<h1>Home page</h1>
+<br/>
+<div class="row text-center">
+    <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+        <h1>AVWX Pricing Guide</h1>
+        <h5>METAR and TAF reports are free to pull forever, but they can be enhanced with paid plans which provide other report types</h5>
+    </div>
+</div>
+<br/>
 {% include 'include/plans.html' %}
-<p><a href={{ url_for('admin.index') }}>Admin Page</a></p>
+<br/>
+<div class="container">
+    <div class="row faq">
+        <div class="col-md-6">
+            <h5>What payment methods are supported?</h5>
+            <p>Most major US and international credit cards are accepted. All payments are handled by <a href="https://stripe.com/">Stripe</a>.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>Can I switch my plans after subscribing?</h5>
+            <p>You can switch your plan at any time. Your API token does not need to be changed when switching to another paid plan.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -70,12 +70,13 @@ def cancel_subscription() -> bool:
     Cancel a subscription
     """
     sid = current_user.subscription_id
-    if not sid:
-        return False
-    subscription = stripe.Subscription.retrieve(sid)
-    subscription.delete()
-    customer = stripe.Customer.retrieve(current_user.customer_id)
-    customer.delete()
+    if sid:
+        subscription = stripe.Subscription.retrieve(sid)
+        subscription.delete()
+    cid = current_user.subscription_id
+    if cid:
+        customer = stripe.Customer.retrieve(cid)
+        customer.delete()
     current_user.customer_id = None
     current_user.subscription_id = None
     current_user.plan = None
