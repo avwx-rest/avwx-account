@@ -1,2 +1,2 @@
 release: flask db upgrade
-web: gunicorn gettingstarted.wsgi --log-file -
+web: gunicorn avwx_account.__init__:app --log-file -
