@@ -46,3 +46,7 @@ If `FLASK_APP` is pointed to `avwx_account/__init__.py`, you can run the app usi
 ```bash
 flask run
 ```
+
+## Deploy
+
+The app is currently deployed on Heroku, so we need to have the `Procfile` for release and run. There's a quirk with Heroku's build pack that doesn't allow for gunicorn to point to an app within a package; the entire app 404s when called. Therefore, the production gunicorn pulls the app from `manage.py` which is currently the file's only use. This might change in the future, but for now it works.

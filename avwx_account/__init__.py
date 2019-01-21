@@ -2,11 +2,15 @@
 avwx_account.__init__ - High-level Flask application
 """
 
-from os import environ
-from flask import Flask
+# stdlib
+from os import environ, path
+# library
+import rollbar
+from flask import Flask, got_request_exception
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from rollbar.contrib.flask import report_exception
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -30,5 +34,20 @@ for key in (
 db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
+
+@app.before_first_request
+def init_rollbar():
+    """
+    Initialize Rollbar exception logging
+    """
+    key = environ.get('LOG_KEY')
+    if not (key and app.env == 'production'):
+        return
+    rollbar.init(
+        key,
+        root=path.dirname(path.realpath(__file__)),
+        allow_logging_basic_config=False
+    )
+    got_request_exception.connect(report_exception, app)
 
 from avwx_account import admin, user_manager, views
