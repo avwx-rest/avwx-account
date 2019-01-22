@@ -2,10 +2,14 @@
 avwx_account.views - App routing and view logic
 """
 
+# library
+import rollbar
 from flask import flash, redirect, render_template, request
 from flask_login import logout_user
 from flask_user import login_required, current_user
-from avwx_account import app, db, payment
+from mailchimp3.mailchimpclient import MailChimpError
+# app
+from avwx_account import app, db, mc, payment
 # from avwx_account.models import User
 
 @app.route('/')
@@ -37,6 +41,20 @@ def delete_account():
     return render_template('delete_account.html',
         form_email=email,
     )
+
+@app.route('/subscribe')
+@login_required
+def subscribe():
+    try:
+        mc.lists.members.create(app.config.get('MC_LIST_ID'), {
+            'email_address': current_user.email,
+            'status': 'subscribed',
+        })
+    except MailChimpError as exc:
+        data = exc.args[0]
+        if data.get('title') != 'Member Exists':
+            rollbar.report_message(data)
+    return redirect('manage')
 
 # Payment management
 

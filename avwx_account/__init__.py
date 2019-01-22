@@ -10,6 +10,7 @@ from flask import Flask, got_request_exception
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from mailchimp3 import MailChimp
 from rollbar.contrib.flask import report_exception
 
 app = Flask(__name__)
@@ -27,6 +28,7 @@ for key in (
     'STRIPE_SECRET_KEY',
     'STRIPE_BASIC_ID',
     'STRIPE_ENTERPRISE_ID',
+    'MC_LIST_ID',
 ):
     if app.config.get(key) is None:
         app.config[key] = environ.get(key)
@@ -34,6 +36,8 @@ for key in (
 db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
+
+mc = MailChimp(mc_api=environ.get('MC_KEY'), mc_user=environ.get('MC_USERNAME'))
 
 @app.before_first_request
 def init_rollbar():
