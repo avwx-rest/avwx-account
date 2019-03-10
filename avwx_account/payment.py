@@ -73,7 +73,7 @@ def cancel_subscription() -> bool:
     if sid:
         subscription = stripe.Subscription.retrieve(sid)
         subscription.delete()
-    cid = current_user.subscription_id
+    cid = current_user.customer_id
     if cid:
         customer = stripe.Customer.retrieve(cid)
         customer.delete()
