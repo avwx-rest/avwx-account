@@ -1,6 +1,9 @@
 # AVWX-Account
 
-[![Requirements Status](https://requires.io/github/flyinactor91/AVWX-Account/requirements.svg?branch=master)](https://requires.io/github/flyinactor91/AVWX-Account/requirements/?branch=master)
+![](https://avwx.rest/static/favicons/apple-icon-76x76.png)
+
+[![Requirements Status](https://requires.io/github/avwx-rest/AVWX-Account/requirements.svg?branch=master)](https://requires.io/github/avwx-rest/AVWX-Account/requirements/?branch=master)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Account management app for AVWX-API
 
@@ -50,3 +53,15 @@ flask run
 ## Deploy
 
 The app is currently deployed on Heroku, so we need to have the `Procfile` for release and run. There's a quirk with Heroku's build pack that doesn't allow for gunicorn to point to an app within a package; the entire app 404s when called. Therefore, the production gunicorn pulls the app from `manage.py` which is currently the file's only use. This might change in the future, but for now it works.
+
+## Develop
+
+Code checked into this repository is expected to be run through the `black` code formatter first.
+
+```bash
+# Install black
+pip install black
+
+# Format py package files
+find avwx_account -iname "*.py" | xargs black
+```

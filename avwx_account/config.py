@@ -8,10 +8,10 @@ avwx_account.config - App config vars
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Flask-Security settings
-SECURITY_PASSWORD_HASH='pbkdf2_sha512'
+SECURITY_PASSWORD_HASH = "pbkdf2_sha512"
 
 # Flask-Mail SMTP server settings
-MAIL_SERVER = 'smtp.mailgun.org'
+MAIL_SERVER = "smtp.mailgun.org"
 MAIL_PORT = 587
 
 # Flask-User settings

@@ -4,6 +4,7 @@ avwx_account.views - Customize flask-user management system
 
 from flask_login import AnonymousUserMixin
 from flask_user import UserManager
+
 # from flask_user.forms import EditUserProfileForm, RegisterForm, StringField
 from avwx_account import app, db
 from avwx_account.models import User
@@ -26,4 +27,6 @@ user_manager = UserManager(app, db, User)
 class Anonymous(AnonymousUserMixin):
     def has_roles(self, *_) -> bool:
         return False
+
+
 user_manager.anonymous_user = Anonymous
