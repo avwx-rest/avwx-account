@@ -4,12 +4,19 @@ avwx_account.models - Manages database models
 
 # stdlib
 from secrets import token_urlsafe
+
+# library
 from flask_user import UserManager, UserMixin
+from sqlalchemy.sql import func
+
+# module
 from avwx_account import db
 
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    created = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated = db.Column(db.DateTime(timezone=True), onupdate=func.now())
     active = db.Column("is_active", db.Boolean(), nullable=False, server_default="1")
 
     email = db.Column(db.String(255), nullable=False, unique=True)

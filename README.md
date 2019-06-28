@@ -26,7 +26,7 @@ CREATE DATABASE avwx_account OWNER avwx;
 Before we can run the migrations, we need to tell Flask where the app is.
 
 ```bash
-export FLASK_APP=avwx_account/__init__.py
+export FLASK_APP=avwx_account:app
 export FLASK_ENV=development
 ```
 

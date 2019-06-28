@@ -115,7 +115,7 @@ def change(plan: str):
         "change.html",
         old_plan=current_user.plan,
         new_plan=plan,
-        new_plan_price=payment.PLANS[plan]["price"],
+        new_plan_price=plan_data["price"],
         change_type="upgrade" if plan == "enterprise" else "downgrade",
     )
 
