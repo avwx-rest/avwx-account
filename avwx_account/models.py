@@ -112,16 +112,22 @@ class Plan(db.Model):
         return hash(self.key)
 
     def __eq__(self, other) -> bool:
+        if not other:
+            return False
         if isinstance(other, str):
             return self.key == other
         return self.key == other.key
 
     def __lt__(self, other) -> bool:
+        if other is None:
+            return False
         if isinstance(other, int):
             return self.level < other
         return self.level < other.level
 
     def __gt__(self, other) -> bool:
+        if other is None:
+            return True
         if isinstance(other, int):
             return self.level > other
         return self.level > other.level
