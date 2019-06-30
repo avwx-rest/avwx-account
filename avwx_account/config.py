@@ -1,5 +1,5 @@
 """
-avwx_account.config - App config vars
+App config vars
 """
 
 # Flask Settings

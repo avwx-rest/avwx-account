@@ -1,12 +1,12 @@
 """
 Cleans unverified users from the database
-
-.env must be loaded to run:
-`set -o allexport; source .env; set +o allexport`
 """
 
 # stdlib
 from datetime import datetime, timedelta, timezone
+
+# library
+from dotenv import load_dotenv
 
 # module
 from avwx_account import db
@@ -30,4 +30,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()

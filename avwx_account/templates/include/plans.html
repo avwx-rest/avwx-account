@@ -12,35 +12,28 @@
                         <li>METAR</li>
                         <li>TAF</li>
                     </ul>
-                    <div class="text-center">
-                        <a class="btn btn-primary " href="https://avwx.docs.apiary.io/">Documentation</a>
-                    </div>
+                    {% with target='free', level=0 %}
+                    {% include 'include/plan_button.html' %}
+                    {% endwith %}
                 </div>
             </div>
         </section>
         <section class="col-md-4">
             <div class="plan plan-better">
                 <header>
-                    <h3>Basic</h3>
+                    <h3>Professional</h3>
                 </header>
                 <div class="plan-body">
                     <h5><b>$10 / month</b></h5>
                     <ul>
                         <li><b>All Hobby features +</b></li>
+                        <li>PIREP</li>
                         <li>Multi-station requests</li>
                         <li>Nearest stations</li>
-                        <li>PIREP</li>
-                        <li>AIREP (Coming Soon!)</li>
                     </ul>
-                    <div class="text-center">
-                        {% if plan == 'basic' %}
-                        <a class="btn btn-disabled" href="#">Current Plan</a>
-                        {% elif plan == 'enterprise' %}
-                        <a class="btn btn-primary" href="{{ url_for('change', plan='basic') }}">Downgrade</a>
-                        {% else %}
-                        <a class="btn btn-primary" href="{{ url_for('activate', plan='basic') }}">Start Free Trial</a>
-                        {% endif %}
-                    </div>
+                    {% with target='pro', level=2 %}
+                    {% include 'include/plan_button.html' %}
+                    {% endwith %}
                 </div>
             </div>
         </section>
@@ -52,17 +45,13 @@
                 <div class="plan-body">
                     <h5><b>$40 / month</b></h5>
                     <ul>
-                        <li><b>All Basic features +</b></li>
+                        <li><b>All Pro features +</b></li>
                         <li>Priority Support</li>
                     </ul>
                     <div class="text-center">
-                        {% if plan == 'enterprise' %}
-                        <a class="btn btn-disabled" href="#">Current Plan</a>
-                        {% elif plan == 'basic' %}
-                        <a class="btn btn-primary" href="{{ url_for('change', plan='enterprise') }}">Upgrade</a>
-                        {% else %}
-                        <a class="btn btn-primary" href="{{ url_for('activate', plan='enterprise') }}">Start Free Trial</a>
-                        {% endif %}
+                        {% with target='enterprise', level=3 %}
+                        {% include 'include/plan_button.html' %}
+                        {% endwith %}
                     </div>
                 </div>
             </div>

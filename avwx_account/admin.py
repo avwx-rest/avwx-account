@@ -1,5 +1,5 @@
 """
-avwx_account.admin - Generates the admin portal
+Customises the admin portal
 """
 
 # library
@@ -11,7 +11,7 @@ from wtforms.fields import PasswordField
 
 # module
 from avwx_account import app, db
-from avwx_account.models import Role, User
+from avwx_account.models import Plan, Role, User
 
 
 class AuthIndexView(AdminIndexView):
@@ -25,9 +25,6 @@ class AuthModel(ModelView):
 
 
 class UserAdmin(AuthModel):
-
-    # User update issue:
-    # https://github.com/flask-admin/flask-admin/issues/782#issuecomment-421886244
 
     column_exclude_list = ("password", "apitoken")
     form_excluded_columns = ("password",)
@@ -46,7 +43,7 @@ class UserAdmin(AuthModel):
         """
         Encrypt the new password if given
         """
-        if len(model.password2):
+        if model.password2:
             model.password = utils.encrypt_password(model.password2)
 
 
@@ -54,3 +51,4 @@ admin = Admin(app, index_view=AuthIndexView())
 
 admin.add_view(UserAdmin(User, db.session))
 admin.add_view(AuthModel(Role, db.session))
+admin.add_view(AuthModel(Plan, db.session))

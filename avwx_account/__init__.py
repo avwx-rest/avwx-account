@@ -1,5 +1,5 @@
 """
-avwx_account.__init__ - High-level Flask application
+AVWX account and token management portal
 """
 
 # stdlib
@@ -17,22 +17,27 @@ from rollbar.contrib.flask import report_exception
 app = Flask(__name__)
 app.config.from_pyfile("config.py")
 
-# Load config vars from env
-# These will overwrite vars in config.py and .env if found
-for key in (
-    "SECRET_KEY",
-    "SQLALCHEMY_DATABASE_URI",
-    "SECURITY_PASSWORD_SALT",
-    "MAIL_USERNAME",
-    "MAIL_PASSWORD",
-    "STRIPE_PUB_KEY",
-    "STRIPE_SECRET_KEY",
-    "STRIPE_BASIC_ID",
-    "STRIPE_ENTERPRISE_ID",
-    "MC_LIST_ID",
-):
-    if app.config.get(key) is None:
-        app.config[key] = environ.get(key)
+
+def load_env():
+    """
+    Load config vars from env
+    These will overwrite vars in config.py and .env if found
+    """
+    for key in (
+        "SECRET_KEY",
+        "SQLALCHEMY_DATABASE_URI",
+        "SECURITY_PASSWORD_SALT",
+        "MAIL_USERNAME",
+        "MAIL_PASSWORD",
+        "STRIPE_PUB_KEY",
+        "STRIPE_SECRET_KEY",
+        "MC_LIST_ID",
+    ):
+        if app.config.get(key) is None:
+            app.config[key] = environ.get(key)
+
+
+load_env()
 
 db = SQLAlchemy(app)
 mail = Mail(app)

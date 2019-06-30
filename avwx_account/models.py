@@ -1,12 +1,12 @@
 """
-avwx_account.models - Manages database models
+Manages database models
 """
 
 # stdlib
 from secrets import token_urlsafe
 
 # library
-from flask_user import UserManager, UserMixin
+from flask_user import UserMixin
 from sqlalchemy.sql import func
 
 # module
@@ -30,7 +30,8 @@ class User(db.Model, UserMixin):
     # API and Payment information
     customer_id = db.Column(db.String(32), nullable=True)
     subscription_id = db.Column(db.String(32), nullable=True)
-    plan = db.Column(db.String(16), nullable=True)
+    plan_id = db.Column(db.Integer, db.ForeignKey("plan.id"))
+    plan = db.relationship("Plan")
     apitoken = db.Column(db.String(43), nullable=True, server_default="")
     active_token = db.Column(db.Boolean(), nullable=False, server_default="0")
 
@@ -39,11 +40,17 @@ class User(db.Model, UserMixin):
         "Role", secondary="user_roles", backref=db.backref("users", lazy="dynamic")
     )
 
-    def __str__(self):
+    def __repr__(self) -> str:
+        return f"<User ({self.id}) {self.email}>"
+
+    def __str__(self) -> str:
         return self.email
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.email)
+
+    def __eq__(self, other) -> bool:
+        return self.email == other.email
 
     def new_token(self) -> bool:
         """
@@ -68,10 +75,13 @@ class Role(db.Model):
     name = db.Column(db.String(50), unique=True)
     description = db.Column(db.String(255))
 
-    def __str__(self):
+    def __repr__(self) -> str:
+        return f"<Role {self.name}>"
+
+    def __str__(self) -> str:
         return self.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
 
@@ -80,3 +90,38 @@ user_roles = db.Table(
     db.Column("user_id", db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE")),
     db.Column("role_id", db.Integer(), db.ForeignKey("role.id", ondelete="CASCADE")),
 )
+
+
+class Plan(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    key = db.Column(db.String(32), unique=True)
+    name = db.Column(db.String(32))
+    type = db.Column(db.String(32))
+    stripe_id = db.Column(db.String(20), nullable=True)
+    description = db.Column(db.String(64))
+    price = db.Column(db.SmallInteger())
+    level = db.Column(db.SmallInteger())
+
+    def __repr__(self) -> str:
+        return f"<Plan {self.key}>"
+
+    def __str__(self) -> str:
+        return self.key
+
+    def __hash__(self) -> int:
+        return hash(self.key)
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, str):
+            return self.key == other
+        return self.key == other.key
+
+    def __lt__(self, other) -> bool:
+        if isinstance(other, int):
+            return self.level < other
+        return self.level < other.level
+
+    def __gt__(self, other) -> bool:
+        if isinstance(other, int):
+            return self.level > other
+        return self.level > other.level

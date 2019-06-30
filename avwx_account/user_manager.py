@@ -1,5 +1,5 @@
 """
-avwx_account.views - Customize flask-user management system
+Customize flask-user management system
 """
 
 from flask_login import AnonymousUserMixin

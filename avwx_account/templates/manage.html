@@ -11,15 +11,16 @@
             <div class="btn-grid">
                 <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
                 <a href="{{ url_for('user.change_password') }}" class="btn btn-primary" role="button"><i class="fas fa-lock"></i> Change Password</a>
-                {% if plan %}
-                <a href="{{ url_for('cancel') }}" class="btn btn-danger" role="button"><i class="fas fa-ban"></i> Cancel Subscription</a>
-                {% endif %}
                 <a href="{{ url_for('delete_account') }}" class="btn btn-danger" role="button"><i class="far fa-trash-alt"></i> Delete Account</a>
             </div>
         </div>
         <div class="col-md-8 col-sm-6">
             <h3>Token</h3>
             <table>
+                <tr>
+                    <td><b>Plan Details:</b></td>
+                    <td>{{ plan.name }} at ${{ plan.price }} / month</td>
+                </tr>
                 <tr>
                     <td><b>Active Token:</b></td>
                     <td>{% if current_user.active_token %}<i class="far fa-check-circle" style="color: green;"></i>{% else %}<i class="far fa-times-circle" style="color: red;"></i>{% endif %}</td>
@@ -31,9 +32,7 @@
                 </tr>
                 {% endif %}
             </table>
-            {% if plan %}
-            <a href="{{ url_for('generate_token') }}" class="btn btn-primary" role="button"><i class="fas fa-key"></i> Refresh Token</a>
-            {% endif %}
+            <a href="{{ url_for('generate_token') }}" class="btn btn-primary" role="button"><i class="fas fa-key"></i> {% if current_user.apitoken %}Refresh Token{% else %}Generate Token{% endif %} </a>
         </div>
     </div>
     <br/>
