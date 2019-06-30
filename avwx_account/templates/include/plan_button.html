@@ -1,7 +1,7 @@
 <div class="text-center">
     {% if plan == target %}
     <a class="btn btn-disabled" href="#">Current Plan</a>
-    {% elif not current_user.customer_id %}
+    {% elif not (plan or current_user.customer_id) %}
         {% if target == 'free' %}
         <a class="btn btn-primary" href="{{ url_for('user.register') }}">Sign Up</a>
         {% else %}
