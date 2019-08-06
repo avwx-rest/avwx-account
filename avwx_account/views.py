@@ -8,6 +8,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import logout_user
 from flask_user import login_required, current_user
 from mailchimp3.mailchimpclient import MailChimpError
+from stripe.error import CardError
 
 # app
 from avwx_account import app, db, mc, plans
@@ -78,7 +79,11 @@ def change(plan: str):
                     flash("Unable to update your subscription", "error")
                     return redirect(url_for("manage"))
             else:
-                plans.new_subscription(new_plan, request.form["stripeToken"])
+                try:
+                    plans.new_subscription(new_plan, request.form["stripeToken"])
+                except CardError as exc:
+                    flash(f"There was an issue with your card: {exc.get('message')}")
+                    return redirect(url_for("manage"))
             msg += ". Thank you for supporting AVWX!"
         else:
             plans.cancel_subscription()

@@ -49,8 +49,10 @@ class User(db.Model, UserMixin):
     def __hash__(self) -> int:
         return hash(self.email)
 
-    def __eq__(self, other) -> bool:
-        return self.email == other.email
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, User):
+            return self.email == other.email
+        return False
 
     def new_token(self) -> bool:
         """
