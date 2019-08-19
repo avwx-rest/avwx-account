@@ -8,7 +8,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import logout_user
 from flask_user import login_required, current_user
 from mailchimp3.mailchimpclient import MailChimpError
-from stripe.error import CardError
+from stripe.error import SignatureVerificationError
 
 # app
 from avwx_account import app, db, mc, plans
@@ -23,7 +23,7 @@ def home():
 @login_required
 def manage():
     if not current_user.plan:
-        current_user.plan = plans.get_plan("free")
+        current_user.plan = plans.Plan.by_key("free")
         db.session.commit()
     return render_template("manage.html", plan=current_user.plan)
 
@@ -63,54 +63,72 @@ def subscribe():
 @app.route("/change/<plan>", methods=["GET", "POST"])
 @login_required
 def change(plan: str):
-    new_plan = plans.get_plan(plan)
+    new_plan = plans.Plan.by_key(plan)
     if new_plan is None:
         return redirect(url_for("manage"))
-    if current_user.plan == plan:
-        flash(f"You are already subscribed to the {plan.name} plan", "info")
+    if current_user.plan == new_plan:
+        flash(f"You are already subscribed to the {new_plan.name} plan", "info")
         return redirect(url_for("manage"))
     old_plan = current_user.plan
+    session = None
     if request.method == "POST":
         msg = f"Your {new_plan.name} plan is now active"
-        # Upgrade to a paid plan
         if new_plan.price:
-            if old_plan.price:
-                if not plans.change_subscription(new_plan):
-                    flash("Unable to update your subscription", "error")
-                    return redirect(url_for("manage"))
-            else:
-                try:
-                    plans.new_subscription(new_plan, request.form["stripeToken"])
-                except CardError as exc:
-                    flash(f"There was an issue with your card: {exc.get('message')}")
-                    return redirect(url_for("manage"))
+            if not plans.change_subscription(new_plan):
+                flash("Unable to update your subscription", "error")
+                return redirect(url_for("manage"))
             msg += ". Thank you for supporting AVWX!"
         else:
             plans.cancel_subscription()
         flash(msg, "success")
         return redirect(url_for("manage"))
+    elif new_plan.price and not current_user.subscription_id:
+        session = plans.get_session(new_plan)
     return render_template(
         "change.html",
         stripe_key=app.config["STRIPE_PUB_KEY"],
         old_plan=old_plan,
         new_plan=new_plan,
+        session=session,
     )
+
+
+@login_required
+@app.route("/stripe/success")
+def stripe_success():
+    flash("Your signup was successful. Thank you for supporting AVWX!", "success")
+    return redirect(url_for("manage"))
+
+
+@login_required
+@app.route("/stripe/cancel")
+def stripe_cancel():
+    flash("It looks like you cancelled signup. No changes have been made", "info")
+    return redirect(url_for("manage"))
+
+
+@app.route("/stripe/fulfill", methods=["POST"])
+def stripe_fulfill():
+    signiture = request.headers.get("Stripe-Signature")
+    try:
+        event = plans.get_event(request.data, signiture)
+    except (ValueError, SignatureVerificationError):
+        return "", 400
+    if event["type"] == "checkout.session.completed":
+        plans.new_subscription(event["data"]["object"])
+        return "", 200
+    return "", 400
 
 
 @app.route("/token")
 @login_required
 def generate_token():
-    if current_user.apitoken and not current_user.active_token:
-        flash("Your API token has been disabled. Contact michael@mdupont.com", "error")
-    elif current_user.new_token():
+    if current_user.new_token():
         db.session.commit()
         flash(
             "Your new API token is now active. It may take up to <b>15 minutes</b> for refreshed keys to be valid in the API",
             "success",
         )
     else:
-        flash(
-            "Your API token could not be generated. Do you have an active subscription?",
-            "error",
-        )
+        flash("Your API token has been disabled. Contact michael@mdupont.com", "error")
     return redirect(url_for("manage"))

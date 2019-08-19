@@ -31,6 +31,8 @@ def load_env():
         "MAIL_PASSWORD",
         "STRIPE_PUB_KEY",
         "STRIPE_SECRET_KEY",
+        "STRIPE_SIGN_SECRET",
+        "ROOT_URL",
         "MC_LIST_ID",
     ):
         if app.config.get(key) is None:

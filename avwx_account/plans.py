@@ -5,43 +5,54 @@ Stripe subscription and customer management
 import stripe
 from flask_user import current_user
 from avwx_account import app, db
-from avwx_account.models import Plan
+from avwx_account.models import Plan, User
 
 stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
-
-def get_plan(plan: str) -> Plan:
-    """
-    Returns a plan by key or None if key not found
-    """
-    return Plan.query.filter(Plan.key == plan).first()
-
-
-def get_customer_id(token: str = None) -> str:
-    """
-    Fetch a customer ID by database lookup or create one if a token is provided
-    """
-    cid = current_user.customer_id
-    if not cid and token:
-        cid = stripe.Customer.create(email=current_user.email, source=token).id
-        current_user.customer_id = cid
-        db.session.commit()
-    return cid
+_ROOT = app.config["ROOT_URL"]
+_SESSION = {
+    "payment_method_types": ["card"],
+    "success_url": _ROOT + "/stripe/success",
+    "cancel_url": _ROOT + "/stripe/cancel",
+}
 
 
-def new_subscription(plan: Plan, token: str) -> bool:
+def get_session(plan: Plan) -> stripe.checkout.Session:
     """
-    Create a new subscription for the current user
+    Creates a Stripe Session object to start a Checkout
     """
-    if plan.stripe_id:
-        customer_id = get_customer_id(token)
-        subscription = stripe.Subscription.create(
-            customer=customer_id, items=[{"plan": plan.stripe_id}]
-        )
-        current_user.subscription_id = subscription.id
-    current_user.plan = plan
+    params = {
+        "client_reference_id": current_user.id,
+        "subscription_data": {"items": [{"plan": plan.stripe_id}]},
+        **_SESSION,
+    }
+    if current_user.customer_id:
+        params["customer"] = current_user.customer_id
+    else:
+        params["customer_email"] = current_user.email
+        params["trial_period_days"] = 14
+    return stripe.checkout.Session.create(**params)
+
+
+def get_event(payload: dict, sig: str) -> stripe.api_resources.event.Event:
+    """
+    Validates a Stripe event to weed out hacked calls
+    """
+    return stripe.Webhook.construct_event(
+        payload, sig, app.config["STRIPE_SIGN_SECRET"]
+    )
+
+
+def new_subscription(session: dict):
+    """
+    Create a new subscription for a validated Checkout Session
+    """
+    user = User.query.get(session["client_reference_id"])
+    user.customer_id = session["customer"]
+    user.subscription_id = session["subscription"]
+    plan_id = session["display_items"][0]["plan"]["id"]
+    user.plan = Plan.by_stripe_id(plan_id)
     db.session.commit()
-    return True
 
 
 def change_subscription(plan: Plan) -> bool:
@@ -71,6 +82,6 @@ def cancel_subscription() -> bool:
         sub = stripe.Subscription.retrieve(current_user.subscription_id)
         sub.delete()
         current_user.subscription_id = None
-    current_user.plan = get_plan("free")
+    current_user.plan = Plan.by_key("free")
     db.session.commit()
     return True

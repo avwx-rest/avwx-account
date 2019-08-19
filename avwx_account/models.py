@@ -58,11 +58,11 @@ class User(db.Model, UserMixin):
         """
         Generate a new API token
         """
-        if self.customer_id and self.subscription_id:
-            self.apitoken = token_urlsafe(32)
-            self.active_token = True
-            return True
-        return False
+        if self.apitoken and not self.active_token:
+            return False
+        self.apitoken = token_urlsafe(32)
+        self.active_token = True
+        return True
 
     def clear_token(self):
         """
@@ -70,6 +70,14 @@ class User(db.Model, UserMixin):
         """
         self.apitoken = None
         self.active_token = False
+
+    @classmethod
+    def by_email(cls, email: str) -> "User":
+        return cls.query.filter(cls.email == email).first()
+
+    @classmethod
+    def by_customer_id(cls, id: str) -> "User":
+        return cls.query.filter(cls.customer_id == id).first()
 
 
 class Role(db.Model):
@@ -133,3 +141,11 @@ class Plan(db.Model):
         if isinstance(other, int):
             return self.level > other
         return self.level > other.level
+
+    @classmethod
+    def by_key(cls, key: str) -> "Plan":
+        return cls.query.filter(cls.key == key).first()
+
+    @classmethod
+    def by_stripe_id(cls, id: str) -> "Plan":
+        return cls.query.filter(cls.stripe_id == id).first()

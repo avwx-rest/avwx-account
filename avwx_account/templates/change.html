@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block headers %}
+<script src="https://js.stripe.com/v3"></script>
+{% endblock %}
+
 {% block content %}
 {% if new_plan.price and not current_user.subscription_id %}
     <h1>Plan Signup</h1>
@@ -12,22 +16,18 @@
         </ul>
         <p>Check their <a href="https://stripe.com/docs/testing#cards">documentation</a> for a full list of test credit card numbers</p>
     {% endif %}
-    <form action="{{ url_for('change', plan=new_plan.key) }}" method="POST">
-        <script
-            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-            data-key="{{ stripe_key }}"
-            data-image="https://avwx.rest/static/favicons/android-icon-96x96.png"
-            data-name="AVWX"
-            data-description="{{ new_plan.description }}"
-            data-email="{{ current_user.email }}"
-            data-amount="{{ new_plan.price * 100 }}"
-            data-label="Subscribe to AVWX"
-            data-panel-label="Subscribe for ${{ new_plan.price }}/month"
-            data-zip-code="true"
-            data-allow-remember-me="false"
-            data-locale="auto">
-        </script>
-    </form>
+    <button id="checkout-button" class="btn btn-primary">Subscribe to AVWX</button>
+    <script>
+        var stripe = Stripe("{{ stripe_key }}");
+        var checkoutButton = document.querySelector('#checkout-button');
+        checkoutButton.addEventListener('click', function () {
+            stripe.redirectToCheckout({
+                sessionId: "{{ session.id }}"
+            }).then(function (result) {
+                console.log(result.error.message);
+            });
+        });
+    </script>
 {% else %}
 <h1>Change Subscription</h1>
 <p>Are you sure you want to {% if new_plan > old_plan %}up{% else %}down{% endif %}grade your plan from <b>{{ old_plan.name }}</b> to <b>{{ new_plan.name }}</b>?</p>
