@@ -30,7 +30,7 @@ def get_session(plan: Plan) -> stripe.checkout.Session:
         params["customer"] = current_user.customer_id
     else:
         params["customer_email"] = current_user.email
-        params["trial_period_days"] = 14
+        params["subscription_data"]["trial_period_days"] = 14
     return stripe.checkout.Session.create(**params)
 
 
