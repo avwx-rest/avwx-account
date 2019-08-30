@@ -85,3 +85,13 @@ def cancel_subscription() -> bool:
     current_user.plan = Plan.by_key("free")
     db.session.commit()
     return True
+
+
+def update_card(token: str) -> bool:
+    """
+    Update stored credit card based on returned Stripe token
+    """
+    if not current_user.customer_id:
+        return False
+    stripe.Customer.modify(current_user.customer_id, source=token)
+    return True

@@ -120,6 +120,21 @@ def stripe_fulfill():
     return "", 400
 
 
+@app.route("/update-card", methods=["GET", "POST"])
+@login_required
+def update_card():
+    if not current_user.customer_id:
+        flash("You have no existing card on file", "info")
+        return redirect(url_for("manage"))
+    if request.method == "POST":
+        if plans.update_card(request.form["stripeToken"]):
+            flash("Your card has been updated", "success")
+        else:
+            flash("Something went wrong while updating your card", "error")
+        return redirect(url_for("manage"))
+    return render_template("update_card.html", stripe_key=app.config["STRIPE_PUB_KEY"])
+
+
 @app.route("/token")
 @login_required
 def generate_token():
