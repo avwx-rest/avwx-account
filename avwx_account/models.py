@@ -111,6 +111,7 @@ class Plan(db.Model):
     description = db.Column(db.String(64))
     price = db.Column(db.SmallInteger())
     level = db.Column(db.SmallInteger())
+    limit = db.Column(db.Integer())
 
     def __repr__(self) -> str:
         return f"<Plan {self.key}>"
