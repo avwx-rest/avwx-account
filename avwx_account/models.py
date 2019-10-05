@@ -82,16 +82,24 @@ class User(db.Model, UserMixin):
 
     @property
     def stripe_data(self) -> stripe.Customer:
-        if self.customer_id:
-            return stripe.Customer.retrieve(self.customer_id)
+        try:
+            if self.customer_id:
+                return stripe.Customer.retrieve(self.customer_id)
+        except stripe.error.InvalidRequestError:
+            pass
         return
 
     def invoices(self, limit: int = 5) -> list:
         """
         Returns the user's recent invoice objects
         """
-        if self.customer_id:
-            return stripe.Invoice.list(customer=self.customer_id, limit=limit)["data"]
+        try:
+            if self.customer_id:
+                return stripe.Invoice.list(customer=self.customer_id, limit=limit)[
+                    "data"
+                ]
+        except stripe.error.InvalidRequestError:
+            pass
         return
 
 
