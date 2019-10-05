@@ -6,6 +6,7 @@ Manages database models
 from secrets import token_urlsafe
 
 # library
+import stripe
 from flask_user import UserMixin
 from sqlalchemy.sql import func
 
@@ -78,6 +79,20 @@ class User(db.Model, UserMixin):
     @classmethod
     def by_customer_id(cls, id: str) -> "User":
         return cls.query.filter(cls.customer_id == id).first()
+
+    @property
+    def stripe_data(self) -> stripe.Customer:
+        if self.customer_id:
+            return stripe.Customer.retrieve(self.customer_id)
+        return
+
+    def invoices(self, limit: int = 5) -> list:
+        """
+        Returns the user's recent invoice objects
+        """
+        if self.customer_id:
+            return stripe.Invoice.list(customer=self.customer_id, limit=limit)["data"]
+        return
 
 
 class Role(db.Model):

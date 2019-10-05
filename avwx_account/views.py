@@ -25,7 +25,9 @@ def manage():
     if not current_user.plan:
         current_user.plan = plans.Plan.by_key("free")
         db.session.commit()
-    return render_template("manage.html", plan=current_user.plan)
+    return render_template(
+        "manage.html", plan=current_user.plan, invoices=current_user.invoices()
+    )
 
 
 @app.route("/delete_account", methods=["GET", "POST"])

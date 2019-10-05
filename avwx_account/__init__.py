@@ -3,6 +3,7 @@ AVWX account and token management portal
 """
 
 # stdlib
+from datetime import datetime
 from os import environ, path
 
 # library
@@ -62,6 +63,14 @@ def init_rollbar():
         allow_logging_basic_config=False,
     )
     got_request_exception.connect(report_exception, app)
+
+
+@app.template_filter("timestamp")
+def format_timestamp(value: int, dt_format: str = r"%d %b %Y %I:%M %p") -> str:
+    """
+    Formats a timestamp int into a datetime string
+    """
+    return datetime.fromtimestamp(value).strftime(dt_format)
 
 
 from avwx_account import admin, user_manager, views
