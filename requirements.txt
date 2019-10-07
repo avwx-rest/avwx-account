@@ -1,4 +1,5 @@
-flask~=1.0
+dnspython~=1.16
+flask~=1.1
 flask-admin~=1.5
 flask-login~=0.4
 flask-migrate~=2.5
@@ -7,6 +8,7 @@ flask-user~=1.0
 mailchimp3~=3.0
 gunicorn~=19.9
 psycopg2-binary~=2.8
+pymongo~=3.9
 python-dotenv~=0.10
 rollbar~=0.14
-stripe~=2.32
+stripe~=2.37

@@ -1,0 +1,5 @@
+<ul>
+    {% for date, value in token_counts.items() %}
+    <li>{{ date | datetime('%x') }}</a> - {{ value }}</li>
+    {% endfor %}
+</ul>

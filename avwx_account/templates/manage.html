@@ -44,10 +44,12 @@
             {% include 'include/invoices.html' %}
         </div>
         {% endif %}
+        {% if token_counts %}
         <div class="col-md-4 col-sm-6">
             <h3>Token History</h3>
-            <p>Coming Soon!</p>
+            {% include 'include/token_counts.html' %}
         </div>
+        {% endif %}
     </div>
     <br/>
     {% include 'include/plans.html' %}

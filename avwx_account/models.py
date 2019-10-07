@@ -3,6 +3,7 @@ Manages database models
 """
 
 # stdlib
+from datetime import datetime
 from secrets import token_urlsafe
 
 # library
@@ -11,7 +12,7 @@ from flask_user import UserMixin
 from sqlalchemy.sql import func
 
 # module
-from avwx_account import db
+from avwx_account import db, mdb
 
 
 class User(db.Model, UserMixin):
@@ -101,6 +102,20 @@ class User(db.Model, UserMixin):
         except stripe.error.InvalidRequestError:
             pass
         return
+
+    def token_usage(self, limit: int = 5) -> {datetime: int}:
+        """
+        Returns recent token usage counts
+        """
+        if not self.active_token:
+            return
+        data = mdb.counter.token.find_one({"_id": self.id}, {"_id": 0})
+        if not data:
+            return
+        data = sorted(data.items(), key=lambda x: x[0], reverse=True)
+        if len(data) > limit:
+            data = data[:limit]
+        return {datetime.strptime(k, r"%Y-%m-%d"): v for k, v in data}
 
 
 class Role(db.Model):

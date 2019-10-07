@@ -26,7 +26,10 @@ def manage():
         current_user.plan = plans.Plan.by_key("free")
         db.session.commit()
     return render_template(
-        "manage.html", plan=current_user.plan, invoices=current_user.invoices()
+        "manage.html",
+        plan=current_user.plan,
+        invoices=current_user.invoices(),
+        token_counts=current_user.token_usage(),
     )
 
 

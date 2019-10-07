@@ -14,6 +14,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from mailchimp3 import MailChimp
 from rollbar.contrib.flask import report_exception
+from pymongo import MongoClient
 
 app = Flask(__name__)
 app.config.from_pyfile("config.py")
@@ -25,19 +26,23 @@ def load_env():
     These will overwrite vars in config.py and .env if found
     """
     for key in (
-        "SECRET_KEY",
-        "SQLALCHEMY_DATABASE_URI",
-        "SECURITY_PASSWORD_SALT",
-        "MAIL_USERNAME",
         "MAIL_PASSWORD",
+        "MAIL_USERNAME",
+        "MC_KEY",
+        "MC_LIST_ID",
+        "MC_USERNAME",
+        "MONGO_URI",
+        "ROOT_URL",
+        "SECRET_KEY",
+        "SECURITY_PASSWORD_SALT",
+        "SQLALCHEMY_DATABASE_URI",
         "STRIPE_PUB_KEY",
         "STRIPE_SECRET_KEY",
         "STRIPE_SIGN_SECRET",
-        "ROOT_URL",
-        "MC_LIST_ID",
     ):
-        if app.config.get(key) is None:
-            app.config[key] = environ.get(key)
+        value = environ.get(key)
+        if value is not None:
+            app.config[key] = value
 
 
 load_env()
@@ -46,7 +51,8 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
 
-mc = MailChimp(mc_api=environ.get("MC_KEY"), mc_user=environ.get("MC_USERNAME"))
+mc = MailChimp(mc_api=app.config["MC_KEY"], mc_user=app.config["MC_USERNAME"])
+mdb = MongoClient(app.config["MONGO_URI"])
 
 
 @app.before_first_request
@@ -71,6 +77,14 @@ def format_timestamp(value: int, dt_format: str = r"%d %b %Y %I:%M %p") -> str:
     Formats a timestamp int into a datetime string
     """
     return datetime.fromtimestamp(value).strftime(dt_format)
+
+
+@app.template_filter("datetime")
+def format_datetime(value: datetime, dt_format: str = r"%d %b %Y %I:%M %p") -> str:
+    """
+    Formats a datetime object into a datetime string
+    """
+    return value.strftime(dt_format)
 
 
 from avwx_account import admin, user_manager, views
