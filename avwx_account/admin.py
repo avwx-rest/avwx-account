@@ -1,5 +1,5 @@
 """
-Customises the admin portal
+Customizes the admin portal
 """
 
 # library

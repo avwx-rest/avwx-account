@@ -101,22 +101,22 @@ def change(plan: str):
 @login_required
 @app.route("/stripe/success")
 def stripe_success():
-    flash("Your signup was successful. Thank you for supporting AVWX!", "success")
+    flash("Your sign-up was successful. Thank you for supporting AVWX!", "success")
     return redirect(url_for("manage"))
 
 
 @login_required
 @app.route("/stripe/cancel")
 def stripe_cancel():
-    flash("It looks like you cancelled signup. No changes have been made", "info")
+    flash("It looks like you cancelled sign-up. No changes have been made", "info")
     return redirect(url_for("manage"))
 
 
 @app.route("/stripe/fulfill", methods=["POST"])
 def stripe_fulfill():
-    signiture = request.headers.get("Stripe-Signature")
+    signature = request.headers.get("Stripe-Signature")
     try:
-        event = plans.get_event(request.data, signiture)
+        event = plans.get_event(request.data, signature)
     except (ValueError, SignatureVerificationError):
         return "", 400
     if event["type"] == "checkout.session.completed":
@@ -152,3 +152,8 @@ def generate_token():
     else:
         flash("Your API token has been disabled. Contact michael@mdupont.com", "error")
     return redirect(url_for("manage"))
+
+
+@app.route("/.well-known/apple-developer-merchantid-domain-association")
+def apple_pay_mid():
+    return app.send_static_file("apple-developer-merchantid-domain-association.dms")
