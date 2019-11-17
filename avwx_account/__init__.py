@@ -88,3 +88,4 @@ def format_datetime(value: datetime, dt_format: str = r"%d %b %Y %I:%M %p") -> s
 
 
 from avwx_account import admin, user_manager, views
+from avwx_account.metrics import app as metrics_app
