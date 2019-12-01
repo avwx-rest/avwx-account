@@ -11,9 +11,10 @@
                         <li>Station Info</li>
                         <li>METAR</li>
                         <li>TAF</li>
+                        <li><b>4k</b> calls per day</li>
                     </ul>
                     {% with target='free', level=0 %}
-                    {% include 'include/plan_button.html' %}
+                    {% include 'include/plan_buttons.html' %}
                     {% endwith %}
                 </div>
             </div>
@@ -25,14 +26,16 @@
                 </header>
                 <div class="plan-body">
                     <h5><b>$10 / month</b></h5>
+                    <h6><b>Or $110 / year</b></h6>
                     <ul>
                         <li><b>All Hobby features +</b></li>
                         <li>PIREP</li>
                         <li>Multi-station requests</li>
                         <li>Nearest stations</li>
+                        <li><b>50k</b> calls per day</li>
                     </ul>
                     {% with target='pro', level=2 %}
-                    {% include 'include/plan_button.html' %}
+                    {% include 'include/plan_buttons.html' %}
                     {% endwith %}
                 </div>
             </div>
@@ -44,13 +47,16 @@
                 </header>
                 <div class="plan-body">
                     <h5><b>$40 / month</b></h5>
+                    <h6><b>Or $440 / year</b></h6>
                     <ul>
                         <li><b>All Pro features +</b></li>
+                        <li>Historic Reports</li>
                         <li>Priority Support</li>
+                        <li><b>500k</b> calls per day</li>
                     </ul>
                     <div class="text-center">
                         {% with target='enterprise', level=3 %}
-                        {% include 'include/plan_button.html' %}
+                        {% include 'include/plan_buttons.html' %}
                         {% endwith %}
                     </div>
                 </div>

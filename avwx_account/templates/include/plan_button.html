@@ -1,13 +1,18 @@
-<div class="text-center">
-    {% if plan == target %}
-    <a class="btn btn-disabled" href="#">Current Plan</a>
-    {% elif not plan or not current_user.customer_id %}
-        {% if target == 'free' %}
-        <a class="btn btn-primary" href="{{ url_for('user.register') }}">Sign Up</a>
-        {% else %}
-        <a class="btn btn-primary" href="{{ url_for('change', plan=target) }}">Start Free Trial</a>
-        {% endif %}
+{% if plan.type == target %}
+<a class="btn btn-disabled" href="#">Current Plan</a>
+{% elif not plan or not current_user.customer_id %}
+    {% if target == 'free' %}
+    <a class="btn btn-primary" href="{{ url_for('user.register') }}">Sign Up</a>
     {% else %}
-    <a class="btn btn-primary" href="{{ url_for('change', plan=target) }}">{% if plan and plan > level %}Down{% else %}Up{% endif %}grade</a>
+    <a class="btn btn-primary" href="{{ url_for('change', plan=target) }}">Start {% if '-year' in target %}Year{% else %}Month{%endif%}ly</a>
     {% endif %}
-</div>
+{% else %}
+<a class="btn btn-primary" href="{{ url_for('change', plan=target) }}">
+    {% if plan.type in target %}
+        Change
+    {% else %}
+        {% if plan and plan > level %}Down{% else %}Up{% endif %}grade
+    {% endif %}
+    {% if target != 'free' %} to {% if '-year' in target %}Year{% else %}Month{%endif%}ly{% endif %}
+</a>
+{% endif %}

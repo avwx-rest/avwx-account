@@ -1,5 +1,5 @@
 <ul>
     {% for inv in invoices %}
-    <li><a href="{{ inv['hosted_invoice_url'] }}">{{ inv["date"] | timestamp('%x') }}</a> - ${{ inv["total"] / 10 }} (<a href="{{ inv['invoice_pdf'] }}">PDF</a>)</li>
+    <li><a href="{{ inv['hosted_invoice_url'] }}">{{ inv["date"] | timestamp('%x') }}</a> - ${{ inv["total"] / 100 }}0 (<a href="{{ inv['invoice_pdf'] }}">PDF</a>)</li>
     {% endfor %}
 </ul>

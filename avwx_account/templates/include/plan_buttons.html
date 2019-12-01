@@ -1,0 +1,10 @@
+<div class="text-center">
+    {% include 'include/plan_button.html' %}
+    {% if target == 'free' %}
+    <a class="btn btn-primary" href="https://avwx.docs.apiary.io/">Documentation</a>
+    {% else %}
+    {% with target=target+'-year' %}
+    {% include 'include/plan_button.html' %}
+    {% endwith %}
+    {% endif %}
+</div>
