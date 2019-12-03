@@ -2,6 +2,9 @@
 App routing and view logic
 """
 
+# stdlib
+import hashlib
+
 # library
 import rollbar
 from flask import flash, redirect, render_template, request, url_for
@@ -41,6 +44,14 @@ def delete_account():
         email = request.form["email"]
         if email == current_user.email:
             plans.cancel_subscription()
+            try:
+                client.lists.members.delete(
+                    app.config.get("MC_LIST_ID"), hashlib.md5(email)
+                )
+            except MailChimpError as exc:
+                data = exc.args[0]
+                # if data.get("title") != "Member Exists":
+                rollbar.report_message(data)
             db.session.delete(current_user)
             db.session.commit()
             logout_user()
