@@ -4,8 +4,8 @@ Stripe subscription and customer management
 
 import stripe
 from flask_user import current_user
-from avwx_account import app, db
-from avwx_account.models import Plan, User
+from avwx_account import app
+from avwx_account.models import Plan, Stripe, User
 
 stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
@@ -26,8 +26,8 @@ def get_session(plan: Plan) -> stripe.checkout.Session:
         "subscription_data": {"items": [{"plan": plan.stripe_id}]},
         **_SESSION,
     }
-    if current_user.customer_id:
-        params["customer"] = current_user.customer_id
+    if current_user.stripe:
+        params["customer"] = current_user.stripe.customer_id
     else:
         params["customer_email"] = current_user.email
         params["subscription_data"]["trial_period_days"] = 14
@@ -47,19 +47,22 @@ def new_subscription(session: dict):
     """
     Create a new subscription for a validated Checkout Session
     """
-    user = User.query.get(session["client_reference_id"])
-    user.customer_id = session["customer"]
-    user.subscription_id = session["subscription"]
+    user = User.objects(id=session["client_reference_id"]).first()
+    user.stripe = Stripe(
+        customer_id=session["customer"], subscription_id=session["subscription"]
+    )
     plan_id = session["display_items"][0]["plan"]["id"]
-    user.plan = Plan.by_stripe_id(plan_id)
-    db.session.commit()
+    user.plan = Plan.by_stripe_id(plan_id).as_embedded()
+    user.save()
 
 
 def change_subscription(plan: Plan) -> bool:
     """
     Change the subscription from one plan to another
     """
-    sub_id = current_user.subscription_id
+    if not current_user.stripe:
+        return False
+    sub_id = current_user.stripe.subscription_id
     if not sub_id or current_user.plan == plan:
         return False
     sub = stripe.Subscription.retrieve(sub_id)
@@ -68,9 +71,9 @@ def change_subscription(plan: Plan) -> bool:
         cancel_at_period_end=False,
         items=[{"id": sub["items"]["data"][0].id, "plan": plan.stripe_id}],
     )
-    current_user.subscription_id = sub.id
+    current_user.stripe.subscription_id = sub.id
     current_user.plan = plan
-    db.session.commit()
+    current_user.save()
     return True
 
 
@@ -78,12 +81,12 @@ def cancel_subscription() -> bool:
     """
     Cancel a subscription
     """
-    if current_user.subscription_id:
-        sub = stripe.Subscription.retrieve(current_user.subscription_id)
+    if current_user.stripe.subscription_id:
+        sub = stripe.Subscription.retrieve(current_user.stripe.subscription_id)
         sub.delete()
-        current_user.subscription_id = None
-    current_user.plan = Plan.by_key("free")
-    db.session.commit()
+        current_user.stripe.subscription_id = None
+    current_user.plan = Plan.by_key("free").as_embedded()
+    current_user.save()
     return True
 
 
@@ -91,7 +94,7 @@ def update_card(token: str) -> bool:
     """
     Update stored credit card based on returned Stripe token
     """
-    if not current_user.customer_id:
+    if not current_user.stripe.customer_id:
         return False
-    stripe.Customer.modify(current_user.customer_id, source=token)
+    stripe.Customer.modify(current_user.stripe.customer_id, source=token)
     return True

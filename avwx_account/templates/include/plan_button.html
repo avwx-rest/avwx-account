@@ -1,6 +1,6 @@
 {% if plan.type == target %}
 <a class="btn btn-disabled" href="#">Current Plan</a>
-{% elif not plan or not current_user.customer_id %}
+{% elif not plan or not current_user.stripe.customer_id %}
     {% if target == 'free' %}
     <a class="btn btn-primary" href="{{ url_for('user.register') }}">Sign Up</a>
     {% else %}

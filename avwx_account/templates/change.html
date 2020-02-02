@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% if new_plan.price and not current_user.subscription_id %}
+{% if new_plan.price and not (current_user.stripe and current_user.stripe.subscription_id) %}
     <h1>Plan Sign Up</h1>
     <p>You're about to sign up for the <b>{{ new_plan.name }}</b> plan for the AVWX REST API. Click the button below to finish.</p>
     {% if config.ENV == 'development' %}

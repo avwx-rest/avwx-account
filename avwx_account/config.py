@@ -2,9 +2,8 @@
 App config vars
 """
 
-# Flask-SQLAlchemy settings
-SQLALCHEMY_DATABASE_URI = None
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+# Mongo Engine settings
+MONGO_URI = "mongodb://localhost:27017/account"
 
 # Flask-Security settings
 SECRET_KEY = "change my secret key"

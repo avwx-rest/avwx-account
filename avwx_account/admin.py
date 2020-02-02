@@ -4,14 +4,15 @@ Customizes the admin portal
 
 # library
 from flask_admin import Admin, AdminIndexView
-from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.mongoengine import ModelView
 from flask_admin.form import SecureForm
+from flask_security.utils import encrypt_password
 from flask_user import current_user
 from wtforms.fields import PasswordField
 
 # module
-from avwx_account import app, db
-from avwx_account.models import Plan, Role, User
+from avwx_account import app
+from avwx_account.models import Plan, User
 
 
 class AuthIndexView(AdminIndexView):
@@ -44,11 +45,10 @@ class UserAdmin(AuthModel):
         Encrypt the new password if given
         """
         if model.password2:
-            model.password = utils.encrypt_password(model.password2)
+            model.password = encrypt_password(model.password2)
 
 
 admin = Admin(app, index_view=AuthIndexView())
 
-admin.add_view(UserAdmin(User, db.session))
-admin.add_view(AuthModel(Role, db.session))
-admin.add_view(AuthModel(Plan, db.session))
+admin.add_view(UserAdmin(User))
+admin.add_view(AuthModel(Plan))

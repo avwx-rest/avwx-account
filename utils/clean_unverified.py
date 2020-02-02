@@ -9,7 +9,6 @@ from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 # module
-from avwx_account import db
 from avwx_account.models import User
 
 
@@ -17,15 +16,11 @@ def main() -> int:
     """
     Delete users with unverified emails older than 30 days
     """
-    users = db.session.query(User).filter(User.email_confirmed_at == None)
+    users = User.objects(email_confirmed_at=None)
     cutoff = datetime.now(timezone.utc) - timedelta(days=30)
-    changed = False
     for user in users:
         if user.created < cutoff:
-            db.session.delete(user)
-            changed = True
-    if changed:
-        db.session.commit()
+            user.delete()
     return 0
 
 

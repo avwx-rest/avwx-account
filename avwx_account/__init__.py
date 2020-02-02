@@ -8,12 +8,12 @@ from os import environ, path
 
 # library
 import rollbar
+from rollbar.contrib.flask import report_exception
 from flask import Flask, got_request_exception
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
+from flask_mongoengine import MongoEngine
 from mailchimp3 import MailChimp
-from rollbar.contrib.flask import report_exception
 from pymongo import MongoClient
 
 app = Flask(__name__)
@@ -35,7 +35,6 @@ def load_env():
         "ROOT_URL",
         "SECRET_KEY",
         "SECURITY_PASSWORD_SALT",
-        "SQLALCHEMY_DATABASE_URI",
         "STRIPE_PUB_KEY",
         "STRIPE_SECRET_KEY",
         "STRIPE_SIGN_SECRET",
@@ -44,15 +43,16 @@ def load_env():
         if value is not None:
             app.config[key] = value
 
+    app.config["MONGODB_SETTINGS"] = {"db": "account", "host": app.config["MONGO_URI"]}
+
 
 load_env()
 
-db = SQLAlchemy(app)
+db = MongoEngine(app)
+mdb = MongoClient(app.config["MONGO_URI"])
 mail = Mail(app)
 migrate = Migrate(app, db)
-
 mc = MailChimp(mc_api=app.config["MC_KEY"], mc_user=app.config["MC_USERNAME"])
-mdb = MongoClient(app.config["MONGO_URI"])
 
 
 @app.before_first_request

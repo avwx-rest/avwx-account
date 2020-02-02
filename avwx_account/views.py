@@ -14,7 +14,7 @@ from mailchimp3.mailchimpclient import MailChimpError
 from stripe.error import SignatureVerificationError
 
 # app
-from avwx_account import app, db, mc, plans
+from avwx_account import app, mc, plans
 
 
 @app.route("/")
@@ -26,8 +26,8 @@ def home():
 @login_required
 def manage():
     if not current_user.plan:
-        current_user.plan = plans.Plan.by_key("free")
-        db.session.commit()
+        current_user.plan = plans.Plan.by_key("free").as_embedded()
+        current_user.save()
     return render_template(
         "manage.html",
         plan=current_user.plan,
@@ -46,14 +46,13 @@ def delete_account():
             plans.cancel_subscription()
             try:
                 mc.lists.members.delete(
-                    app.config.get("MC_LIST_ID"), hashlib.md5(email)
+                    app.config.get("MC_LIST_ID"), hashlib.md5(email.encode("utf-8"))
                 )
             except MailChimpError as exc:
                 data = exc.args[0]
                 # if data.get("title") != "Member Exists":
                 rollbar.report_message(data)
-            db.session.delete(current_user)
-            db.session.commit()
+            current_user.delete()
             logout_user()
             flash("Your account has been deleted", "success")
             return redirect(url_for("home"))
@@ -79,7 +78,7 @@ def subscribe():
 @app.route("/change/<plan>", methods=["GET", "POST"])
 @login_required
 def change(plan: str):
-    new_plan = plans.Plan.by_key(plan)
+    new_plan = plans.Plan.by_key(plan).as_embedded()
     if new_plan is None:
         return redirect(url_for("manage"))
     if current_user.plan == new_plan:
@@ -98,8 +97,9 @@ def change(plan: str):
             plans.cancel_subscription()
         flash(msg, "success")
         return redirect(url_for("manage"))
-    elif new_plan.price and not current_user.subscription_id:
-        session = plans.get_session(new_plan)
+    if new_plan.price:
+        if current_user.stripe is None or not current_user.stripe.subscription_id:
+            session = plans.get_session(new_plan)
     return render_template(
         "change.html",
         stripe_key=app.config["STRIPE_PUB_KEY"],
@@ -139,7 +139,7 @@ def stripe_fulfill():
 @app.route("/update-card", methods=["GET", "POST"])
 @login_required
 def update_card():
-    if not current_user.customer_id:
+    if not current_user.stripe.customer_id:
         flash("You have no existing card on file", "info")
         return redirect(url_for("manage"))
     if request.method == "POST":
@@ -155,7 +155,7 @@ def update_card():
 @login_required
 def generate_token():
     if current_user.new_token():
-        db.session.commit()
+        current_user.save()
         flash(
             "Your new API token is now active. It may take up to <b>15 minutes</b> for refreshed keys to be valid in the API",
             "success",

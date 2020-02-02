@@ -11,7 +11,7 @@
             <div class="btn-grid">
                 <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
                 <a href="{{ url_for('user.change_password') }}" class="btn btn-primary" role="button"><i class="fas fa-lock"></i> Change Password</a>
-                <a href="{{ url_for('update_card') }}" class="btn btn-primary" role="button"><i class="fas fa-credit-card"></i> Update Card</a>
+                {% if current_user.stripe.subscription_id %}<a href="{{ url_for('update_card') }}" class="btn btn-primary" role="button"><i class="fas fa-credit-card"></i> Update Card</a>{% endif %}
                 <a href="{{ url_for('delete_account') }}" class="btn btn-danger" role="button"><i class="far fa-trash-alt"></i> Delete Account</a>
             </div>
         </div>
@@ -20,16 +20,16 @@
             <table>
                 <tr>
                     <td><b>Plan Details:</b></td>
-                    <td>{{ plan.name }} at <b>${{ plan.price }}</b> / {% if '-year' in plan.key %}year{% else %}month{% endif %} & <b>{{ plan.limit // 1000 }}k</b> calls / day</td>
+                    <td>{{ current_user.plan.name }} at <b>${{ current_user.plan.price }}</b> / {% if '-year' in current_user.plan.key %}year{% else %}month{% endif %} & <b>{{ current_user.plan.limit // 1000 }}k</b> calls / day</td>
                 </tr>
                 <tr>
                     <td><b>Active Token:</b></td>
-                    <td>{% if current_user.active_token %}<i class="far fa-check-circle" style="color: green;"></i>{% else %}<i class="far fa-times-circle" style="color: red;"></i>{% endif %}</td>
+                    <td>{% if current_user.token.active %}<i class="far fa-check-circle" style="color: green;"></i>{% else %}<i class="far fa-times-circle" style="color: red;"></i>{% endif %}</td>
                 </tr>
-                {% if current_user.active_token %}
+                {% if current_user.token.active %}
                 <tr>
                     <td><b>API Token:</b></td>
-                    <td>{{ current_user.apitoken }}</td>
+                    <td>{{ current_user.token.value }}</td>
                 </tr>
                 {% endif %}
             </table>
