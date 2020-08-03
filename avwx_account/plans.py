@@ -80,6 +80,8 @@ def cancel_subscription() -> bool:
     """
     Cancel a subscription
     """
+    if not current_user.stripe:
+        return False
     if current_user.stripe.subscription_id:
         sub = stripe.Subscription.retrieve(current_user.stripe.subscription_id)
         sub.delete()
