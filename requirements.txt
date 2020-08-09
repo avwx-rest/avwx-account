@@ -11,4 +11,4 @@ mailchimp3~=3.0
 gunicorn~=20.0
 python-dotenv~=0.14
 rollbar~=0.15
-stripe~=2.49
+stripe~=2.50

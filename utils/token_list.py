@@ -25,9 +25,9 @@ def dev_token() -> dict:
     """
     Returns a new unique dev token
     """
-    value = token_urlsafe(32)
+    value = "dev-" + token_urlsafe(32)[4:]
     while mdb.account.user.find_one({"token.value": value}, {"_id": 1}):
-        value = token_urlsafe(32)
+        value = "dev-" + token_urlsafe(32)[4:]
     return {
         "_id": ObjectId(),
         "name": "Development",
@@ -42,7 +42,7 @@ def main() -> int:
     Convert account token into list of tokens
     """
     for user in mdb.account.user.find(
-        {"tokens": {"$exists": 0}}, {"token": 1, "plan": 1}
+        {"tokens": {"$exists": 1}}, {"token": 1, "plan": 1}
     ):
         print(user)
         tokens = []
