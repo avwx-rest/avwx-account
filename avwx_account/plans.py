@@ -52,6 +52,7 @@ def new_subscription(session: dict):
     )
     plan_id = session["display_items"][0]["plan"]["id"]
     user.plan = Plan.by_stripe_id(plan_id).as_embedded()
+    user.new_token(dev=True)
     user.save()
 
 
@@ -87,6 +88,7 @@ def cancel_subscription() -> bool:
         sub.delete()
         current_user.stripe.subscription_id = None
     current_user.plan = Plan.by_key("free").as_embedded()
+    current_user.remove_token_by(type="dev")
     current_user.save()
     return True
 

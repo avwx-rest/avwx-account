@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Edit Token</h1>
+<p><b>{% if token.type == "dev" %}Development {% endif %}Token</b>: {{ token.value }}</p>
+<form action="{{ url_for('edit_token', value=token.value) }}" method="POST">
+    <label for="active"><b>Enabled</b>:</label>
+    <input type="checkbox" id="active" name="active" value="active" {% if token.active %}checked{% endif %}>
+    <br/>
+    <label for="name"><b>Name</b>:</label>
+    <input type="text" name="name" value="{{ token.name }}">
+    <br/>
+    <input class="btn btn-primary" type="submit" value="Update Token">
+    {% if token.type != "dev" %}<a href="{{ url_for('delete_token', value=token.value) }}" class="btn btn-danger"><i class="far fa-trash-alt"></i> Delete Token</a>{% endif %}
+</form>
+{% endblock %}

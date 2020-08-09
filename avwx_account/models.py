@@ -5,9 +5,11 @@ Manages database models
 # stdlib
 from datetime import datetime
 from secrets import token_urlsafe
+from typing import Optional
 
 # library
 import stripe as stripelib
+from bson import ObjectId
 from flask_user import UserMixin
 
 # module
@@ -20,8 +22,46 @@ class Stripe(db.EmbeddedDocument):
 
 
 class Token(db.EmbeddedDocument):
+    _id = db.ObjectIdField()
+    name = db.StringField()
+    type = db.StringField()
     value = db.StringField()
-    active = db.BooleanField(default=False)
+    active = db.BooleanField(default=True)
+
+    @property
+    def is_unique(self) -> bool:
+        resp = mdb.account.user.find_one({"tokens.value": self.value}, {"_id": 1})
+        return resp is None
+
+    def _gen(self):
+        value = token_urlsafe(32)
+        if self.type == "dev":
+            value = "dev-" + value[4:]
+        self.value = value
+
+    @classmethod
+    def new(cls, name: str = "Token", type: str = "app"):
+        """
+        Generate a new unique token
+        """
+        token = cls(_id=ObjectId(), name=name, type=type, value="")
+        token.refresh()
+        return token
+
+    @classmethod
+    def dev(cls):
+        """
+        Generate a new development token
+        """
+        return cls.new("Development", "dev")
+
+    def refresh(self):
+        """
+        Refresh the token value
+        """
+        self._gen()
+        while not self.is_unique:
+            self._gen()
 
 
 class PlanBase:
@@ -96,6 +136,7 @@ class Plan(db.Document, PlanBase):
 
 class User(db.Document, UserMixin):
     active = db.BooleanField(default=False)
+    disabled = db.BooleanField(default=False)
     old_id = db.IntField()
 
     email = db.EmailField(unique=True)
@@ -110,6 +151,7 @@ class User(db.Document, UserMixin):
     stripe = db.EmbeddedDocumentField(Stripe)
     plan = db.EmbeddedDocumentField(PlanEmbedded)
     token = db.EmbeddedDocumentField(Token)
+    tokens = db.ListField(db.EmbeddedDocumentField(Token), default=[])
 
     roles = db.ListField(db.StringField(), default=[])
 
@@ -127,20 +169,75 @@ class User(db.Document, UserMixin):
             return self.email == other.email
         return False
 
-    def new_token(self) -> bool:
+    def new_token(self, dev: bool = False) -> bool:
         """
         Generate a new API token
         """
-        if self.token and not self.token.active:
+        if self.disabled:
             return False
-        self.token = Token(value=token_urlsafe(32), active=True)
+        if dev:
+            for token in self.tokens:
+                if token.type == "dev":
+                    return False
+            token = Token.dev()
+        else:
+            token = Token.new()
+        self.tokens.append(token)
         return True
 
-    def clear_token(self):
+    def get_token(self, value: str) -> Optional[str]:
         """
-        Clears an active token
+        Returns a Token matching the token value
         """
-        self.token = None
+        for token in self.tokens:
+            if value and token.value == value:
+                return token
+        return None
+
+    def update_token(self, value: str, name: str, active: bool) -> bool:
+        """
+        Update certain fields on a Token matching a token value
+        """
+        for i, token in enumerate(self.tokens):
+            if value and token.value == value:
+                self.tokens[i].name = name
+                self.tokens[i].active = active
+                return True
+        return False
+
+    def refresh_token(self, value: str):
+        """
+        Create a new Token value
+        """
+        for i, token in enumerate(self.tokens):
+            if value and token.value == value:
+                self.tokens[i].refresh()
+
+    # def token_usage(self, limit: int = 5) -> Dict[datetime, int]:
+    #     """
+    #     Returns recent token usage counts
+    #     """
+    #     if not (self.token and self.token.active):
+    #         return
+    #     data = mdb.account.token.aggregate(
+    #         [
+    #             {"$match": {"user_id": self.id}},
+    #             {"$project": {"_id": 0, "date": 1, "count": 1}},
+    #             {"$sort": {"date": -1}},
+    #             {"$limit": limit},
+    #         ]
+    #     )
+    #     return {item["date"]: item["count"] for item in data}
+
+    def remove_token_by(self, value: str = None, type: str = None) -> bool:
+        """
+        Remove the first token encountered matching a value or type
+        """
+        for i, token in enumerate(self.tokens):
+            if (value and token.value == value) or (type and token.type == type):
+                self.tokens.pop(i)
+                return True
+        return False
 
     @classmethod
     def by_email(cls, email: str) -> "User":
@@ -173,19 +270,3 @@ class User(db.Document, UserMixin):
             )["data"]
         except (AttributeError, stripelib.error.InvalidRequestError):
             pass
-
-    def token_usage(self, limit: int = 5) -> {datetime: int}:
-        """
-        Returns recent token usage counts
-        """
-        if not (self.token and self.token.active):
-            return
-        data = mdb.account.token.aggregate(
-            [
-                {"$match": {"user_id": self.id}},
-                {"$project": {"_id": 0, "date": 1, "count": 1}},
-                {"$sort": {"date": -1}},
-                {"$limit": limit},
-            ]
-        )
-        return {item["date"]: item["count"] for item in data}

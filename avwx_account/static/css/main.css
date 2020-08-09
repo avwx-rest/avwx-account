@@ -75,6 +75,33 @@ nav .col-xs-auto {
     margin: 2px;
 }
 
+#token-table {
+    border-collapse: collapse;
+}
+
+#token-table th, #token-table td {
+    border: 1px #4f68ae solid;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+}
+
+#token-table th, #token-table th a {
+    background-color: #4f68ae;
+    color: white;
+}
+
+#token-table td {
+    background-color: white;
+}
+
+#token-table td a {
+    color: #4f68ae;
+}
+
+.center {
+    text-align: center;
+}
+
 footer {
     position: absolute;
     right: 0;

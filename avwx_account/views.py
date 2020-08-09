@@ -32,7 +32,7 @@ def manage():
         "manage.html",
         plan=current_user.plan,
         invoices=current_user.invoices(),
-        token_counts=current_user.token_usage(),
+        # token_counts=current_user.token_usage(),
     )
 
 
@@ -151,18 +151,70 @@ def update_card():
     return render_template("update_card.html", stripe_key=app.config["STRIPE_PUB_KEY"])
 
 
-@app.route("/token")
+@app.route("/token/new")
 @login_required
-def generate_token():
+def new_token():
     if current_user.new_token():
         current_user.save()
-        flash(
-            "Your new API token is now active. It may take up to <b>15 minutes</b> for refreshed keys to be valid in the API",
-            "success",
-        )
     else:
         flash("Your API token has been disabled. Contact michael@mdupont.com", "error")
     return redirect(url_for("manage"))
+
+
+@app.route("/token/edit", methods=["GET", "POST"])
+@login_required
+def edit_token():
+    token = current_user.get_token(request.args.get("value"))
+    if token is None:
+        flash("Token not found in your account", "error")
+        return redirect(url_for("manage"))
+    if request.method == "POST":
+        print(request.form)
+        if current_user.update_token(
+            token.value,
+            name=request.form.get("name", "App"),
+            active=bool(request.form.get("active")),
+        ):
+            current_user.save()
+            return redirect(url_for("manage"))
+        else:
+            flash("Your token was not able to be updated", "error")
+    return render_template("edit_token.html", token=token)
+
+
+@app.route("/token/refresh")
+def refresh_token():
+    token = current_user.get_token(request.args.get("value"))
+    if token is None:
+        flash("Token not found in your account", "error")
+        return redirect(url_for("manage"))
+    current_user.refresh_token(token.value)
+    current_user.save()
+    return redirect(url_for("manage"))
+
+
+@app.route("/token/delete")
+def delete_token():
+    token = current_user.get_token(request.args.get("value"))
+    if token is None:
+        flash("Token not found in your account", "error")
+    elif token.type == "dev":
+        flash("Cannot delete a development token. Disable instead", "error")
+    else:
+        current_user.remove_token_by(value=token.value)
+        current_user.save()
+    return redirect(url_for("manage"))
+
+
+# @app.route("/token/usage")
+# def delete_token():
+#     token = current_user.get_token(request.args.get("value"))
+#     if token is None:
+#         flash("Token not found in your account", "error")
+#         return redirect(url_for("manage"))
+#     current_user.remove_token_usage(value=token.value)
+#     current_user.save()
+#     return render_template("token_usage.html", token_counts=token_counts)
 
 
 @app.route("/.well-known/apple-developer-merchantid-domain-association")

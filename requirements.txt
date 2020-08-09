@@ -1,5 +1,5 @@
-dnspython~=1.16
-email-validator~=1.0
+dnspython~=2.0
+email-validator~=1.1
 flask~=1.1
 flask-admin~=1.5
 flask-login~=0.5
@@ -9,6 +9,6 @@ flask-security~=3.0
 flask-user~=1.0
 mailchimp3~=3.0
 gunicorn~=20.0
-python-dotenv~=0.13
+python-dotenv~=0.14
 rollbar~=0.15
-stripe~=2.46
+stripe~=2.49

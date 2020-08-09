@@ -27,7 +27,7 @@ class AuthModel(ModelView):
 
 class UserAdmin(AuthModel):
 
-    column_exclude_list = ("password", "apitoken")
+    column_exclude_list = ("password", "tokens")
     form_excluded_columns = ("password",)
     form_base_class = SecureForm
     column_auto_select_related = True
