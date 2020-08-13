@@ -45,9 +45,8 @@ def delete_account():
         if email == current_user.email:
             plans.cancel_subscription()
             try:
-                mc.lists.members.delete(
-                    app.config.get("MC_LIST_ID"), hashlib.md5(email.encode("utf-8"))
-                )
+                target = hashlib.md5(email.encode("utf-8")).hexdigest()
+                mc.lists.members.delete(app.config.get("MC_LIST_ID"), target)
             except MailChimpError as exc:
                 data = exc.args[0]
                 # if data.get("title") != "Member Exists":
