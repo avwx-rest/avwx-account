@@ -20,7 +20,10 @@
             <p><b>Current Plan</b>: {{ current_user.plan.name }} at <b>${{ current_user.plan.price }}</b> / {% if '-year' in current_user.plan.key %}year{% else %}month{% endif %} & <b>{{ current_user.plan.limit // 1000 }}k</b> calls / day</p>
             <table id="token-table">
                 <tr>
-                    <th class="center"><a href="{{ url_for('new_token') }}" title="Create new token"><i class="fas fa-plus"></i></a></th>
+                    <th class="center">
+                        <a href="{{ url_for('token_usage') }}" title="Token usage chart"><i class="fas fa-chart-area"></i></a>
+                        <a href="{{ url_for('new_token') }}" title="Create new token"><i class="fas fa-plus"></i></a>
+                    </th>
                     <th>Name</th>
                     <th>Enabled</th>
                     <th>Value</th>

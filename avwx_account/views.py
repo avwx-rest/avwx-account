@@ -2,6 +2,8 @@
 App routing and view logic
 """
 
+# pylint: disable=missing-function-docstring
+
 # stdlib
 import hashlib
 
@@ -29,10 +31,7 @@ def manage():
         current_user.plan = plans.Plan.by_key("free").as_embedded()
         current_user.save()
     return render_template(
-        "manage.html",
-        plan=current_user.plan,
-        invoices=current_user.invoices(),
-        # token_counts=current_user.token_usage(),
+        "manage.html", plan=current_user.plan, invoices=current_user.invoices(),
     )
 
 
@@ -168,7 +167,6 @@ def edit_token():
         flash("Token not found in your account", "error")
         return redirect(url_for("manage"))
     if request.method == "POST":
-        print(request.form)
         if current_user.update_token(
             token.value,
             name=request.form.get("name", "App"),
@@ -176,8 +174,7 @@ def edit_token():
         ):
             current_user.save()
             return redirect(url_for("manage"))
-        else:
-            flash("Your token was not able to be updated", "error")
+        flash("Your token was not able to be updated", "error")
     return render_template("edit_token.html", token=token)
 
 
@@ -203,17 +200,6 @@ def delete_token():
         current_user.remove_token_by(value=token.value)
         current_user.save()
     return redirect(url_for("manage"))
-
-
-# @app.route("/token/usage")
-# def delete_token():
-#     token = current_user.get_token(request.args.get("value"))
-#     if token is None:
-#         flash("Token not found in your account", "error")
-#         return redirect(url_for("manage"))
-#     current_user.remove_token_usage(value=token.value)
-#     current_user.save()
-#     return render_template("token_usage.html", token_counts=token_counts)
 
 
 @app.route("/.well-known/apple-developer-merchantid-domain-association")

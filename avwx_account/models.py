@@ -3,9 +3,9 @@ Manages database models
 """
 
 # stdlib
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from secrets import token_urlsafe
-from typing import Optional
+from typing import Dict, Optional
 
 # library
 import stripe as stripelib
@@ -155,6 +155,9 @@ class User(db.Document, UserMixin):
 
     roles = db.ListField(db.StringField(), default=[])
 
+    _token_cache = None
+    _update_cache_at = None
+
     def __repr__(self) -> str:
         return f"<User {self.email}>"
 
@@ -185,12 +188,16 @@ class User(db.Document, UserMixin):
         self.tokens.append(token)
         return True
 
-    def get_token(self, value: str) -> Optional[str]:
+    def get_token(
+        self, value: Optional[str] = None, _id: Optional[ObjectId] = None
+    ) -> Optional[str]:
         """
-        Returns a Token matching the token value
+        Returns a Token matching the token value or id
         """
         for token in self.tokens:
             if value and token.value == value:
+                return token
+            if _id and token._id == _id:
                 return token
         return None
 
@@ -213,21 +220,57 @@ class User(db.Document, UserMixin):
             if value and token.value == value:
                 self.tokens[i].refresh()
 
-    # def token_usage(self, limit: int = 5) -> Dict[datetime, int]:
-    #     """
-    #     Returns recent token usage counts
-    #     """
-    #     if not (self.token and self.token.active):
-    #         return
-    #     data = mdb.account.token.aggregate(
-    #         [
-    #             {"$match": {"user_id": self.id}},
-    #             {"$project": {"_id": 0, "date": 1, "count": 1}},
-    #             {"$sort": {"date": -1}},
-    #             {"$limit": limit},
-    #         ]
-    #     )
-    #     return {item["date"]: item["count"] for item in data}
+    @property
+    def _should_use_cache(self) -> bool:
+        if self._token_cache is None:
+            return False
+        if len(self._token_cache) != len(self.tokens):
+            return False
+        return datetime.now(tz=timezone.utc) > self._update_cache_at
+
+    def token_usage(
+        self, limit: int = 30, refresh: bool = False
+    ) -> Dict[ObjectId, dict]:
+        """
+        Returns recent token usage counts
+        """
+        if not (self.token and self.token.active):
+            return {}
+        if refresh or self._should_use_cache:
+            return self._token_cache
+        target = datetime.now(tz=timezone.utc) - timedelta(days=limit)
+        data = mdb.account.token.aggregate(
+            [
+                {"$match": {"user_id": self.id, "date": {"$gte": target}}},
+                {"$project": {"_id": 0, "date": 1, "count": 1, "token_id": 1}},
+                {
+                    "$group": {
+                        "_id": "$date",
+                        "counts": {
+                            "$push": {"token_id": "$token_id", "count": "$count"}
+                        },
+                    }
+                },
+            ]
+        )
+        data = {
+            i["_id"].date(): {j["token_id"]: j["count"] for j in i["counts"]}
+            for i in data
+        }
+        days = [(target + timedelta(days=i)).date() for i in range(limit)]
+        app_tokens = {t._id: [] for t in self.tokens if t.type != "dev"}
+        dev_tokens = {t._id: [] for t in self.tokens if t.type == "dev"}
+        for day in days:
+            tokens = data.get(day, {})
+            for token_id in app_tokens:
+                app_tokens[token_id].append(tokens.get(token_id, 0))
+            for token_id in dev_tokens:
+                dev_tokens[token_id].append(tokens.get(token_id, 0))
+        ret = {"days": days, "app": app_tokens, "dev": dev_tokens}
+        ret["total"] = [sum(i) for i in zip(*app_tokens.values())]
+        self._token_cache = ret
+        self._update_cache_at = datetime.now(tz=timezone.utc) + timedelta(minutes=5)
+        return ret
 
     def remove_token_by(self, value: str = None, type: str = None) -> bool:
         """

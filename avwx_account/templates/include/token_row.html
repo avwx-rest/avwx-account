@@ -1,5 +1,6 @@
 <tr>
     <td>
+        <a href="{{ url_for('token_usage', value=token.value, type=token.type) }}" title="Token usage chart"><i class="fas fa-chart-area"></i></a>
         <a href="{{ url_for('edit_token', value=token.value) }}" title="Edit token metadata"><i class="fas fa-edit"></i></a>
         <a href="{{ url_for('refresh_token', value=token.value) }}" title="Refresh token value"><i class="fas fa-redo"></i></a>
     </td>
