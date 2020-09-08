@@ -48,8 +48,9 @@ def delete_account():
                 mc.lists.members.delete(app.config.get("MC_LIST_ID"), target)
             except MailChimpError as exc:
                 data = exc.args[0]
-                # if data.get("title") != "Member Exists":
-                rollbar.report_message(data)
+                if data.get("status") != 404:
+                    # if data.get("title") != "Member Exists":
+                    rollbar.report_message(data)
             current_user.delete()
             logout_user()
             flash("Your account has been deleted", "success")
@@ -68,7 +69,14 @@ def subscribe():
         )
     except MailChimpError as exc:
         data = exc.args[0]
-        if data.get("title") != "Member Exists":
+        detail = data.get("detail")
+        if detail and "fake or invalid" in detail:
+            current_user.disabled = True
+            flash(
+                "Your email looks suspicious. Your account has been created, but new API tokens can't be made. Email the admin to enable your account",
+                "warning",
+            )
+        elif data.get("title") != "Member Exists":
             rollbar.report_message(data)
     return redirect(url_for("manage"))
 
@@ -179,6 +187,7 @@ def edit_token():
 
 
 @app.route("/token/refresh")
+@login_required
 def refresh_token():
     token = current_user.get_token(request.args.get("value"))
     if token is None:
@@ -190,6 +199,7 @@ def refresh_token():
 
 
 @app.route("/token/delete")
+@login_required
 def delete_token():
     token = current_user.get_token(request.args.get("value"))
     if token is None:
