@@ -42,24 +42,18 @@ class Token(db.EmbeddedDocument):
 
     @classmethod
     def new(cls, name: str = "Token", type: str = "app"):
-        """
-        Generate a new unique token
-        """
+        """Generate a new unique token"""
         token = cls(_id=ObjectId(), name=name, type=type, value="")
         token.refresh()
         return token
 
     @classmethod
     def dev(cls):
-        """
-        Generate a new development token
-        """
+        """Generate a new development token"""
         return cls.new("Development", "dev")
 
     def refresh(self):
-        """
-        Refresh the token value
-        """
+        """Refresh the token value"""
         self._gen()
         while not self.is_unique:
             self._gen()
@@ -151,7 +145,6 @@ class User(db.Document, UserMixin):
     # API and Payment information
     stripe = db.EmbeddedDocumentField(Stripe)
     plan = db.EmbeddedDocumentField(PlanEmbedded)
-    token = db.EmbeddedDocumentField(Token)
     tokens = db.ListField(db.EmbeddedDocumentField(Token), default=[])
 
     roles = db.ListField(db.StringField(), default=[])
@@ -174,9 +167,7 @@ class User(db.Document, UserMixin):
         return False
 
     def new_token(self, dev: bool = False) -> bool:
-        """
-        Generate a new API token
-        """
+        """Generate a new API token"""
         if self.disabled:
             return False
         if dev:
@@ -192,9 +183,7 @@ class User(db.Document, UserMixin):
     def get_token(
         self, value: Optional[str] = None, _id: Optional[ObjectId] = None
     ) -> Optional[str]:
-        """
-        Returns a Token matching the token value or id
-        """
+        """Returns a Token matching the token value or id"""
         for token in self.tokens:
             if value and token.value == value:
                 return token
@@ -203,9 +192,7 @@ class User(db.Document, UserMixin):
         return None
 
     def update_token(self, value: str, name: str, active: bool) -> bool:
-        """
-        Update certain fields on a Token matching a token value
-        """
+        """Update certain fields on a Token matching a token value"""
         for i, token in enumerate(self.tokens):
             if value and token.value == value:
                 self.tokens[i].name = name
@@ -214,9 +201,7 @@ class User(db.Document, UserMixin):
         return False
 
     def refresh_token(self, value: str):
-        """
-        Create a new Token value
-        """
+        """Create a new Token value"""
         for i, token in enumerate(self.tokens):
             if value and token.value == value:
                 self.tokens[i].refresh()
@@ -232,9 +217,7 @@ class User(db.Document, UserMixin):
     def token_usage(
         self, limit: int = 30, refresh: bool = False
     ) -> Dict[ObjectId, dict]:
-        """
-        Returns recent token usage counts
-        """
+        """Returns recent token usage counts"""
         if not self.tokens:
             return {}
         if not refresh and self._should_use_cache:
@@ -274,9 +257,7 @@ class User(db.Document, UserMixin):
         return ret
 
     def remove_token_by(self, value: str = None, type: str = None) -> bool:
-        """
-        Remove the first token encountered matching a value or type
-        """
+        """Remove the first token encountered matching a value or type"""
         for i, token in enumerate(self.tokens):
             if (value and token.value == value) or (type and token.type == type):
                 self.tokens.pop(i)
@@ -301,9 +282,7 @@ class User(db.Document, UserMixin):
             return stripelib.Customer.retrieve(self.stripe.customer_id)
 
     def invoices(self, limit: int = 5) -> List[dict]:
-        """
-        Returns the user's recent invoice objects
-        """
+        """Returns the user's recent invoice objects"""
         with suppress(AttributeError, stripelib.error.InvalidRequestError):
             return stripelib.Invoice.list(
                 customer=self.stripe.customer_id, limit=limit

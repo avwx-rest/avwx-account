@@ -65,3 +65,9 @@ pip install black
 # Format py package files
 find avwx_account -iname "*.py" | xargs black
 ```
+
+It's also recommended to use `pylint`:
+
+```bash
+pip install pylint pylint-flask pylint-mongoengine
+```

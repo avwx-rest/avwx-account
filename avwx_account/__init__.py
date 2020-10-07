@@ -21,8 +21,7 @@ app.config.from_pyfile("config.py")
 
 
 def load_env():
-    """
-    Load config vars from env
+    """Load config vars from env
     These will overwrite vars in config.py and .env if found
     """
     for key in (
@@ -57,9 +56,7 @@ mc = MailChimp(mc_api=app.config["MC_KEY"], mc_user=app.config["MC_USERNAME"])
 
 @app.before_first_request
 def init_rollbar():
-    """
-    Initialize Rollbar exception logging
-    """
+    """Initialize Rollbar exception logging"""
     key = environ.get("LOG_KEY")
     if not (key and app.env == "production"):
         return
@@ -73,17 +70,13 @@ def init_rollbar():
 
 @app.template_filter("timestamp")
 def format_timestamp(value: int, dt_format: str = r"%d %b %Y %I:%M %p") -> str:
-    """
-    Formats a timestamp int into a datetime string
-    """
+    """Formats a timestamp int into a datetime string"""
     return datetime.fromtimestamp(value).strftime(dt_format)
 
 
 @app.template_filter("datetime")
 def format_datetime(value: datetime, dt_format: str = r"%d %b %Y %I:%M %p") -> str:
-    """
-    Formats a datetime object into a datetime string
-    """
+    """Formats a datetime object into a datetime string"""
     return value.strftime(dt_format)
 
 

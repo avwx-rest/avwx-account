@@ -18,9 +18,7 @@ _SESSION = {
 
 
 def get_session(plan: Plan) -> stripe.checkout.Session:
-    """
-    Creates a Stripe Session object to start a Checkout
-    """
+    """Creates a Stripe Session object to start a Checkout"""
     params = {
         "client_reference_id": current_user.id,
         "subscription_data": {"items": [{"plan": plan.stripe_id}]},
@@ -34,18 +32,14 @@ def get_session(plan: Plan) -> stripe.checkout.Session:
 
 
 def get_event(payload: dict, sig: str) -> stripe.api_resources.event.Event:
-    """
-    Validates a Stripe event to weed out hacked calls
-    """
+    """Validates a Stripe event to weed out hacked calls"""
     return stripe.Webhook.construct_event(
         payload, sig, app.config["STRIPE_SIGN_SECRET"]
     )
 
 
 def new_subscription(session: dict):
-    """
-    Create a new subscription for a validated Checkout Session
-    """
+    """Create a new subscription for a validated Checkout Session"""
     user = User.objects(id=session["client_reference_id"]).first()
     user.stripe = Stripe(
         customer_id=session["customer"], subscription_id=session["subscription"]
@@ -57,9 +51,7 @@ def new_subscription(session: dict):
 
 
 def change_subscription(plan: Plan) -> bool:
-    """
-    Change the subscription from one plan to another
-    """
+    """Change the subscription from one plan to another"""
     if not current_user.stripe:
         return False
     sub_id = current_user.stripe.subscription_id
@@ -78,9 +70,7 @@ def change_subscription(plan: Plan) -> bool:
 
 
 def cancel_subscription() -> bool:
-    """
-    Cancel a subscription
-    """
+    """Cancel a subscription"""
     if not current_user.stripe:
         return False
     if current_user.stripe.subscription_id:
@@ -94,9 +84,7 @@ def cancel_subscription() -> bool:
 
 
 def update_card(token: str) -> bool:
-    """
-    Update stored credit card based on returned Stripe token
-    """
+    """Update stored credit card based on returned Stripe token"""
     if not current_user.stripe.customer_id:
         return False
     stripe.Customer.modify(current_user.stripe.customer_id, source=token)

@@ -33,17 +33,13 @@ class UserAdmin(AuthModel):
     column_auto_select_related = True
 
     def scaffold_form(self) -> SecureForm:
-        """
-        Add a change password field to User form
-        """
+        """Add a change password field to User form"""
         form_class = super(UserAdmin, self).scaffold_form()
         form_class.password2 = PasswordField("New Password")
         return form_class
 
     def on_model_change(self, form: SecureForm, model: User, is_created: bool):
-        """
-        Encrypt the new password if given
-        """
+        """Encrypt the new password if given"""
         if model.password2:
             model.password = encrypt_password(model.password2)
 

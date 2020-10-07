@@ -21,9 +21,7 @@ COLORS = ("red", "orange", "yellow", "green", "blue", "purple", "pink")
 def format_count(
     label: str, counts: List[int], color: str, dashed: bool = False
 ) -> dict:
-    """
-    Format a line dataset for chart.js
-    """
+    """Format a line dataset for chart.js"""
     ret = {
         "label": label,
         "data": counts,
