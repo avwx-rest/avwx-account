@@ -151,6 +151,7 @@ class User(db.Document, UserMixin):
     # API and Payment information
     stripe = db.EmbeddedDocumentField(Stripe)
     plan = db.EmbeddedDocumentField(PlanEmbedded)
+    token = db.EmbeddedDocumentField(Token)
     tokens = db.ListField(db.EmbeddedDocumentField(Token), default=[])
 
     roles = db.ListField(db.StringField(), default=[])
