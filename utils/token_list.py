@@ -2,9 +2,12 @@
 Convert account token into list of tokens
 """
 
+# stdlib
+from contextlib import suppress
 from os import environ
 from secrets import token_urlsafe
 
+# library
 from bson import ObjectId
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -46,15 +49,11 @@ def main() -> int:
     ):
         print(user)
         tokens = []
-        try:
+        with suppress(KeyError):
             tokens.append(format_token(user["token"]))
-        except KeyError:
-            pass
-        try:
+        with suppress(KeyError):
             if user["plan"]["type"] != "free":
                 tokens.append(dev_token())
-        except KeyError:
-            pass
         resp = mdb.account.user.update_one(
             {"_id": user["_id"]}, {"$set": {"tokens": tokens}}
         )

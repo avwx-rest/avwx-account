@@ -3,9 +3,10 @@ Manages database models
 """
 
 # stdlib
+from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 from secrets import token_urlsafe
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 # library
 import stripe as stripelib
@@ -150,7 +151,6 @@ class User(db.Document, UserMixin):
     # API and Payment information
     stripe = db.EmbeddedDocumentField(Stripe)
     plan = db.EmbeddedDocumentField(PlanEmbedded)
-    token = db.EmbeddedDocumentField(Token)
     tokens = db.ListField(db.EmbeddedDocumentField(Token), default=[])
 
     roles = db.ListField(db.StringField(), default=[])
@@ -222,7 +222,7 @@ class User(db.Document, UserMixin):
 
     @property
     def _should_use_cache(self) -> bool:
-        if self._token_cache is None:
+        if not self._token_cache:
             return False
         if len(self._token_cache) != len(self.tokens):
             return False
@@ -234,9 +234,9 @@ class User(db.Document, UserMixin):
         """
         Returns recent token usage counts
         """
-        if not (self.token and self.token.active):
+        if not self.tokens:
             return {}
-        if refresh or self._should_use_cache:
+        if not refresh and self._should_use_cache:
             return self._token_cache
         target = datetime.now(tz=timezone.utc) - timedelta(days=limit)
         data = mdb.account.token.aggregate(
@@ -295,21 +295,16 @@ class User(db.Document, UserMixin):
         return self.id.generation_time
 
     @property
-    def stripe_data(self) -> stripelib.Customer:
-        try:
+    def stripe_data(self) -> Optional[stripelib.Customer]:
+        with suppress(AttributeError, stripelib.error.InvalidRequestError):
             return stripelib.Customer.retrieve(self.stripe.customer_id)
-        except AttributeError:
-            pass
-        except stripelib.error.InvalidRequestError:
-            pass
 
-    def invoices(self, limit: int = 5) -> list:
+    def invoices(self, limit: int = 5) -> List[dict]:
         """
         Returns the user's recent invoice objects
         """
-        try:
+        with suppress(AttributeError, stripelib.error.InvalidRequestError):
             return stripelib.Invoice.list(
                 customer=self.stripe.customer_id, limit=limit
             )["data"]
-        except (AttributeError, stripelib.error.InvalidRequestError):
-            pass
+        return []
