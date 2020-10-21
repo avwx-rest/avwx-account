@@ -77,7 +77,12 @@ def subscribe():
                 "warning",
             )
         elif data.get("title") != "Member Exists":
-            rollbar.report_message(data)
+            rollbar.report_message(data.update({"email": current_user.email}))
+    except ConnectionError:
+        flash(
+            'Something went wrong while adding you to the email list. If you wish to receive email updates, <a href="/subscribe">click here</a> to try again',
+            "info",
+        )
     return redirect(url_for("manage"))
 
 
