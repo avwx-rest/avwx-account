@@ -37,6 +37,8 @@ def load_env():
         "STRIPE_PUB_KEY",
         "STRIPE_SECRET_KEY",
         "STRIPE_SIGN_SECRET",
+        "RECAPTCHA_PUBLIC_KEY",
+        "RECAPTCHA_PRIVATE_KEY",
     ):
         value = environ.get(key)
         if value is not None:

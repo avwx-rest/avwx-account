@@ -41,3 +41,9 @@ ROOT_URL = "http://use.ngrok.for.this.locally/"
 STRIPE_PUB_KEY = "stripe public key"
 STRIPE_SECRET_KEY = "stripe secret key"
 STRIPE_SIGN_SECRET = "stripe webhook signing key"
+
+# reCAPTCHA
+RECAPTCHA_USE_SSL = True
+RECAPTCHA_PUBLIC_KEY = "recaptcha public key"
+RECAPTCHA_PRIVATE_KEY = "recaptcha private key"
+RECAPTCHA_OPTIONS = {"theme": "black"}
