@@ -17,7 +17,9 @@ def main() -> int:
     """Remove accounts that haven't confirmed their email recently"""
     now = datetime.now(tz=timezone.utc)
     count = 0
-    for user in mdb.account.user.find({"email_confirmed_at": {"$exists": 0}}, {"_id": 1, "email": 1}):
+    for user in mdb.account.user.find(
+        {"email_confirmed_at": {"$exists": 0}}, {"_id": 1, "email": 1}
+    ):
         oid = user["_id"]
         if now - oid.generation_time > cutoff:
             count += 1
