@@ -4,19 +4,15 @@ App routing and view logic
 
 # pylint: disable=missing-function-docstring
 
-# stdlib
-import hashlib
-
 # library
-import rollbar
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import logout_user
 from flask_user import login_required, current_user
-from mailchimp3.mailchimpclient import MailChimpError
 from stripe.error import SignatureVerificationError
 
 # app
-from avwx_account import app, mc, plans
+import avwx_account.mail as mail
+from avwx_account import app, plans
 
 
 @app.route("/")
@@ -43,14 +39,7 @@ def delete_account():
         email = request.form["email"]
         if email == current_user.email:
             plans.cancel_subscription()
-            try:
-                target = hashlib.md5(email.encode("utf-8")).hexdigest()
-                mc.lists.members.delete(app.config.get("MC_LIST_ID"), target)
-            except MailChimpError as exc:
-                data = exc.args[0]
-                if data.get("status") != 404:
-                    # if data.get("title") != "Member Exists":
-                    rollbar.report_message(data)
+            mail.delete_from_mailing_list(email)
             current_user.delete()
             logout_user()
             flash("Your account has been deleted", "success")
@@ -62,27 +51,14 @@ def delete_account():
 @app.route("/subscribe")
 @login_required
 def subscribe():
-    try:
-        mc.lists.members.create(
-            app.config.get("MC_LIST_ID"),
-            {"email_address": current_user.email, "status": "subscribed"},
-        )
-    except MailChimpError as exc:
-        data = exc.args[0]
-        detail = data.get("detail")
-        if detail and "fake or invalid" in detail:
-            current_user.disabled = True
-            flash(
-                "Your email looks suspicious. Your account has been created, but new API tokens can't be made. Email the admin to enable your account",
-                "warning",
-            )
-        elif data.get("title") != "Member Exists":
-            rollbar.report_message(data.update({"email": current_user.email}))
-    except ConnectionError:
-        flash(
-            'Something went wrong while adding you to the email list. If you wish to receive email updates, <a href="/subscribe">click here</a> to try again',
-            "info",
-        )
+    if not current_user.subscribed:
+        msg = mail.add_to_mailing_list(current_user.email)
+        if msg is None:
+            current_user.subscribed = True
+            current_user.save()
+    else:
+        msg = "You have already subscribed"
+    flash(msg or "Added to the mailing list", "info")
     return redirect(url_for("manage"))
 
 

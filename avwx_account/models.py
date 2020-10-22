@@ -132,7 +132,6 @@ class Plan(db.Document, PlanBase):
 class User(db.Document, UserMixin):
     active = db.BooleanField(default=False)
     disabled = db.BooleanField(default=False)
-    old_id = db.IntField()
 
     email = db.EmailField(unique=True)
     email_confirmed_at = db.DateTimeField()
@@ -147,6 +146,7 @@ class User(db.Document, UserMixin):
     plan = db.EmbeddedDocumentField(PlanEmbedded)
     tokens = db.ListField(db.EmbeddedDocumentField(Token), default=[])
 
+    subscribed = db.BooleanField(default=False)
     roles = db.ListField(db.StringField(), default=[])
 
     _token_cache = None
