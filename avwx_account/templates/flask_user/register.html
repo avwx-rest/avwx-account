@@ -35,12 +35,27 @@
     {% endif %}
 
     {{ render_field(form.password, tabindex=230) }}
+    {% if form.password.errors %}
+        {% for e in form.password.errors %}
+            <p class="help-block">{{ e }}</p>
+        {% endfor %}
+    {% endif %}
 
     {% if user_manager.USER_REQUIRE_RETYPE_PASSWORD %}
         {{ render_field(form.retype_password, tabindex=240) }}
+        {% if form.retype_password.errors %}
+            {% for e in form.retype_password.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
     {% endif %}
 
     {{ render_field(form.recaptcha, tabindex=240) }}
+    {% if form.recaptcha.errors %}
+        {% for e in form.recaptcha.errors %}
+            <p class="help-block">{{ e }}</p>
+        {% endfor %}
+    {% endif %}
 
     {{ render_submit_field(form.submit, tabindex=280) }}
 </form>
