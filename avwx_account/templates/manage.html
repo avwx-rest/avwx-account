@@ -19,6 +19,7 @@
         <div class="col-md-8 col-sm-6">
             <h3>Tokens</h3>
             <p><b>Current Plan</b>: {{ current_user.plan.name }} at <b>${{ current_user.plan.price }}</b> / {% if '-year' in current_user.plan.key %}year{% else %}month{% endif %} & <b>{{ current_user.plan.limit // 1000 }}k</b> calls / day</p>
+            {% if current_user.tokens %}
             <table id="token-table">
                 <tr>
                     <th class="center">
@@ -33,6 +34,9 @@
                 {% include 'include/token_row.html' %}
                 {% endfor %}
             </table>
+            {% else %}
+            <p><a href="{{ url_for('new_token') }}" title="Create new token"><i class="fas fa-plus"></i> Create New Token</a></p>
+            {% endif %}
         </div>
     </div>
     <br/>
