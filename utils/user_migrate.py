@@ -6,6 +6,7 @@ Move to root to import mongoengine models
 
 # stdlib
 from os import environ
+from typing import List
 
 # library
 import psycopg2
@@ -45,10 +46,8 @@ PLAN_FIELDS = {
 PLANS = {}
 
 
-def fill_model(data: [str], fields: dict, model: "mongo model") -> "mongo model":
-    """
-    Populates a mongo model with SQL query data according to a key map
-    """
+def fill_model(data: List[str], fields: dict, model: "mongo model") -> "mongo model":
+    """Populates a mongo model with SQL query data according to a key map"""
     new_data = {k: data[i] for k, i in fields.items()}
     # Filter out all-null items
     for item in new_data.values():
@@ -60,18 +59,14 @@ def fill_model(data: [str], fields: dict, model: "mongo model") -> "mongo model"
 
 
 def get_plans(cur):
-    """
-    Populate the plan embedded dict
-    """
+    """Populate the plan embedded dict"""
     cur.execute("SELECT * FROM public.plan;")
     for plan in cur.fetchall():
         PLANS[plan[0]] = fill_model(plan, PLAN_FIELDS, PlanEmbedded)
 
 
-def handle_user(data: [str]):
-    """
-    Convert user SQL query into a mongo document and save
-    """
+def handle_user(data: List[str]):
+    """Convert user SQL query into a mongo document and save"""
     user = fill_model(data, USER_FIELDS, User)
     user.stripe = fill_model(data, STRIPE_FIELDS, Stripe)
     user.token = fill_model(data, TOKEN_FIELDS, Token)
@@ -80,9 +75,7 @@ def handle_user(data: [str]):
 
 
 def main() -> int:
-    """
-    Copy all users from sql to mongo
-    """
+    """Copy all users from sql to mongo"""
     conn = psycopg2.connect(environ.get("SQLALCHEMY_DATABASE_URI"))
     cur = conn.cursor()
     get_plans(cur)

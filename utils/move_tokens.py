@@ -14,9 +14,7 @@ load_dotenv()
 
 
 def main() -> int:
-    """
-    Move and reformat tokens into account db
-    """
+    """Move and reformat tokens into account db"""
     mdb = MongoClient(environ["MONGO_URI"])
     for token in mdb.counter.token.find():
         user = mdb.account.user.find_one({"old_id": token["_id"]}, {"_id": 1})

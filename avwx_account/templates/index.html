@@ -13,7 +13,7 @@
 <br/>
 <div class="row text-center">
     <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-        <h1>AVWX Pricing Guide</h1>
+        <h1>AVWX Plans</h1>
         <h5>METAR and TAF reports are free to pull with additional report types and features available to paid plans</h5>
     </div>
 </div>
@@ -21,22 +21,51 @@
 {% include 'include/plans.html' %}
 <br/>
 <div class="container">
+    <div class="row text-center">
+        <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+            <h1>FAQ</h1>
+        </div>
+    </div>
     <div class="row faq">
         <div class="col-md-6">
             <h5>What payment methods are supported?</h5>
-            <p>Most major US and international credit cards are accepted. All payments are handled by <a href="https://stripe.com/">Stripe</a>.</p>
+            <p>Most major credit cards and Apple Pay are accepted. All payments are handled by <a href="https://stripe.com/">Stripe</a>.</p>
         </div>
         <div class="col-md-6">
             <h5>Can I switch my plans after subscribing?</h5>
-            <p>You can switch your plan at any time. Your API token does not need to be changed when switching to another plan.</p>
+            <p>You can switch your plan at any time. Your API tokens do not need to be changed when switching to another plan.</p>
         </div>
         <div class="col-md-6">
             <h5>Do you have any options for open-source projects?</h5>
-            <p>I have an open-source plan available which mirrors the free plan but with a higher call limit. If you are the creator or maintainer of a project currently using AVWX, <a href="mailto:avwx@dupont.dev">email me</a> with a link to your project repo.</p>
+            <p>There is an open-source plan available which mirrors the free plan but with a higher call limit. If you are the creator or maintainer of a project currently using AVWX, <a href="mailto:avwx@dupont.dev">email me</a> with a link to your project repo.</p>
         </div>
         <div class="col-md-6">
             <h5>What if I need a higher call limit?</h5>
-            <p>If you need more than what the Enterprise plan provides, <a href="mailto:avwx@dupont.dev">email me</a> so we can make a custom plan that fits your specific use-case.</p>
+            <p>If you need more than what the Enterprise plan provides, <a href="mailto:avwx@dupont.dev">email me</a> so we can make a custom plan (features, calls, pricing) that fits your specific use-case.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>What happens if I hit the call limit?</h5>
+            <p>Currently, the API will return a 429 error code for the remainder of the day. The count is reset at 00:00Z every day. I'm currently working on an opt-in option to allow overage billing instead of cutting access. It should be available by the end of January 2021.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>How can I create an API token?</h5>
+            <p>Once you create an account, there should be a button to generate your first API token. You can create more tokens by pressing the + button in the table header. You can edit details for each token in the list.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>How is my API usage calculated?</h5>
+            <p>All plans can generate as many API tokens as you need. The sum of all token usage counts towards the call limit. For example, a pro plan with two tokens with 20k & 25k calls still has 5k calls remaining in the day.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>How do I use the development token?</h5>
+            <p>Paid plans are given a separate token with 4k calls that doesn't count against their plan limit. Because the token usage is capped, it should not be used for any production systems.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>What happens if I refresh an API token?</h5>
+            <p>Because each API token has a private ID internally, you can refresh a token's value as much as you want. You won't lose any usage data.</p>
+        </div>
+        <div class="col-md-6">
+            <h5>How do I view my token usage?</h5>
+            <p>You can view the last 30 days of token usage by selecting the chart icons in the token list. Press the header icon to display all tokens or each row for a single token.</p>
         </div>
     </div>
 </div>

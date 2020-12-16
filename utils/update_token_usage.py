@@ -12,9 +12,7 @@ mdb = MongoClient(environ["MONGO_URI"])
 
 
 def main() -> int:
-    """
-    Add token_id to token usage collection
-    """
+    """Add token_id to token usage collection"""
     for user in mdb.account.user.find({"tokens": {"$exists": 1}}, {"tokens": 1}):
         print(user)
         tokens = [t for t in user["tokens"] if t["type"] == "app"]

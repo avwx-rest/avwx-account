@@ -18,16 +18,12 @@ mdb = MongoClient(environ["MONGO_URI"])
 
 
 def format_token(token: dict) -> dict:
-    """
-    Updates token with new field defaults
-    """
+    """Updates token with new field defaults"""
     return {"_id": ObjectId(), "name": "App", "type": "app", **token}
 
 
 def dev_token() -> dict:
-    """
-    Returns a new unique dev token
-    """
+    """Returns a new unique dev token"""
     value = "dev-" + token_urlsafe(32)[4:]
     while mdb.account.user.find_one({"token.value": value}, {"_id": 1}):
         value = "dev-" + token_urlsafe(32)[4:]
@@ -41,9 +37,7 @@ def dev_token() -> dict:
 
 
 def main() -> int:
-    """
-    Convert account token into list of tokens
-    """
+    """Convert account token into list of tokens"""
     for user in mdb.account.user.find(
         {"tokens": {"$exists": 1}}, {"token": 1, "plan": 1}
     ):
