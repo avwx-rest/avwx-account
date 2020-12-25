@@ -11,7 +11,6 @@ import rollbar
 from rollbar.contrib.flask import report_exception
 from flask import Flask, got_request_exception
 from flask_mail import Mail
-from flask_migrate import Migrate
 from flask_mongoengine import MongoEngine
 from mailchimp3 import MailChimp
 from pymongo import MongoClient
@@ -52,7 +51,6 @@ load_env()
 db = MongoEngine(app)
 mdb = MongoClient(app.config["MONGO_URI"])
 mail = Mail(app)
-migrate = Migrate(app, db)
 mc = MailChimp(mc_api=app.config["MC_KEY"], mc_user=app.config["MC_USERNAME"])
 
 

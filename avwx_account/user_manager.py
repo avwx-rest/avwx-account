@@ -2,6 +2,8 @@
 Customize flask-user management system
 """
 
+# pylint: disable=missing-class-docstring,missing-function-docstring,attribute-defined-outside-init
+
 from flask_login import AnonymousUserMixin
 from flask_user import UserManager
 from flask_user.forms import RegisterForm
@@ -16,15 +18,16 @@ class CustomRegisterForm(RegisterForm):
 
 
 class CustomUserManager(UserManager):
-    def customize(self, app):
+    def customize(self, _):
         self.RegisterFormClass = CustomRegisterForm
 
 
 user_manager = CustomUserManager(app, db, User)
 
-# Say that anonymous users have no roles
 class Anonymous(AnonymousUserMixin):
-    def has_roles(self, *_) -> bool:
+    """Say that anonymous users have no roles"""
+    @staticmethod
+    def has_roles(*_) -> bool:
         return False
 
 

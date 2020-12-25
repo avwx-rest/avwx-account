@@ -34,7 +34,7 @@ class UserAdmin(AuthModel):
 
     def scaffold_form(self) -> SecureForm:
         """Add a change password field to User form"""
-        form_class = super(UserAdmin, self).scaffold_form()
+        form_class = super().scaffold_form()
         form_class.password2 = PasswordField("New Password")
         return form_class
 

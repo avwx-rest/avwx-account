@@ -60,6 +60,8 @@ class Token(db.EmbeddedDocument):
 
 
 class PlanBase:
+    meta = {"strict": False}
+
     key = db.StringField()
     name = db.StringField()
     type = db.StringField()
@@ -68,6 +70,7 @@ class PlanBase:
     price = db.IntField()
     level = db.IntField()
     limit = db.IntField()
+    overage = db.BooleanField(default=False)
 
     def __repr__(self) -> str:
         return f"<Plan {self.key}>"
@@ -130,6 +133,8 @@ class Plan(db.Document, PlanBase):
 
 
 class User(db.Document, UserMixin):
+    meta = {"strict": False}
+
     active = db.BooleanField(default=False)
     disabled = db.BooleanField(default=False)
 
@@ -145,6 +150,7 @@ class User(db.Document, UserMixin):
     stripe = db.EmbeddedDocumentField(Stripe)
     plan = db.EmbeddedDocumentField(PlanEmbedded)
     tokens = db.ListField(db.EmbeddedDocumentField(Token), default=[])
+    allow_overage = db.BooleanField(default=False)
 
     subscribed = db.BooleanField(default=False)
     roles = db.ListField(db.StringField(), default=[])
