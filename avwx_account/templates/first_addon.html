@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block headers %}
+<script src="https://js.stripe.com/v3"></script>
+{% endblock %}
+
+{% block content %}
+<h1>{{ addon.name }} Sign Up</h1>
+<p>You're about to add {{ addon.description }} to your {{ current_user.plan.name }} plan. This will add {{ addon.price }} to your invoice from AVWX.</p>
+{% include 'include/stripe_checkout.html' %}
+{% endblock %}

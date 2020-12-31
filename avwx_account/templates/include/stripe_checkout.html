@@ -1,0 +1,20 @@
+{% if config.ENV == 'development' %}
+    <p>Since the app is in development: use the following Stripe card numbers and make up the rest:</p>
+    <ul>
+        <li>Success: 4242 4242 4242 4242</li>
+        <li>Error: 4000 0000 0000 0002</li>
+    </ul>
+    <p>Check their <a href="https://stripe.com/docs/testing#cards">documentation</a> for a full list of test credit card numbers</p>
+{% endif %}
+<button id="checkout-button" class="btn btn-primary">Subscribe to AVWX</button>
+<script>
+    var stripe = Stripe("{{ stripe_key }}");
+    var checkoutButton = document.querySelector('#checkout-button');
+    checkoutButton.addEventListener('click', function () {
+        stripe.redirectToCheckout({
+            sessionId: "{{ session.id }}"
+        }).then(function (result) {
+            console.log(result.error.message);
+        });
+    });
+</script>

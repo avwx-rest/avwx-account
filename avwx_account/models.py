@@ -17,6 +17,17 @@ from flask_user import UserMixin
 from avwx_account import db, mdb
 
 
+class Addon(db.Document):
+    meta = {"strict": False}
+
+    key = db.StringField(unique=True)
+    stripe_id = db.StringField()
+
+    @classmethod
+    def by_key(cls, key: str) -> "Addon":
+        return cls.objects(key=key).first()
+
+
 class Stripe(db.EmbeddedDocument):
     customer_id = db.StringField()
     subscription_id = db.StringField()
@@ -282,10 +293,17 @@ class User(db.Document, UserMixin):
     def created(self) -> datetime:
         return self.id.generation_time
 
+    # @property
+    # def stripe_data(self) -> Optional[stripelib.Customer]:
+    #     with suppress(AttributeError, stripelib.error.InvalidRequestError):
+    #         return stripelib.Customer.retrieve(self.stripe.customer_id)
+
     @property
-    def stripe_data(self) -> Optional[stripelib.Customer]:
-        with suppress(AttributeError, stripelib.error.InvalidRequestError):
-            return stripelib.Customer.retrieve(self.stripe.customer_id)
+    def has_subscription(self) -> bool:
+        """Returns True if the user has a Stripe subscription ID"""
+        with suppress(AttributeError):
+            return isinstance(self.stripe.subscription_id, str)
+        return False
 
     def invoices(self, limit: int = 5) -> List[dict]:
         """Returns the user's recent invoice objects"""
@@ -294,3 +312,20 @@ class User(db.Document, UserMixin):
                 customer=self.stripe.customer_id, limit=limit
             )["data"]
         return []
+
+    def has_addon(self, key: str) -> bool:
+        """Returns True if user has an addon in their subscription"""
+        addon = Addon.by_key(key)
+        with suppress(AttributeError, stripelib.error.InvalidRequestError):
+            sub = stripelib.Subscription.retrieve(self.stripe.subscription_id)
+            for item in sub["items"]["data"]:
+                if item["price"]["id"] == addon.stripe_id:
+                    return True
+        return False
+
+    def add_addon(self, key: str):
+        """Adds an addon to the user's subscription"""
+        addon = Addon.by_key(key)
+        stripelib.SubscriptionItem.create(
+            subscription=self.stripe.subscription_id, price=addon.stripe_id
+        )

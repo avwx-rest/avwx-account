@@ -44,14 +44,58 @@ def change(plan: str):
     )
 
 
-@app.route("/plan/overage")
+# Disabled because Stripe Checkout can't accept a standalone metered item
+# @app.route("/plan/overage/new")
+# @login_required
+# def new_overage():
+#     """Enable overage for an account with no Stripe subscription"""
+#     if current_user.allow_overage:
+#         flash("Limit overage is already enabled")
+#         return redirect(url_for("manage"))
+#     if current_user.has_subscription:
+#         if current_user.has_addon("overage"):
+#             flash("Limit overage is already whitelisted for your account")
+#             return redirect(url_for("manage"))
+#         else:
+#             return redirect(url_for("enable_overage"))
+#     return render_template(
+#         "first_addon.html",
+#         stripe_key=app.config["STRIPE_PUB_KEY"],
+#         session = plans.get_session(Addon.by_key("overage")),
+#     )
+
+
+@app.route("/plan/overage/enable")
 @login_required
-def toggle_overage():
-    if current_user.plan.overage:
-        current_user.allow_overage = not current_user.allow_overage
-        state = "en" if current_user.allow_overage else "dis"
-        flash(f"Limit overage has been {state}abled")
-    else:
-        current_user.allow_overage = False
-    current_user.save()
+def enable_overage():
+    """Enable overage for a subscribed account"""
     return redirect(url_for("manage"))
+
+    # if current_user.allow_overage:
+    #     flash("Limit overage is already enabled")
+    #     return redirect(url_for("manage"))
+    # if not current_user.has_addon("overage"):
+    #     if not current_user.has_subscription:
+    #         # return redirect(url_for("new_overage"))
+    #         flash("Limit overage requires a paid account")
+    #         return redirect(url_for("manage"))
+    #     current_user.add_addon("overage")
+    # current_user.allow_overage = True
+    # current_user.save()
+    # flash("Limit overage has been enabled")
+    # return redirect(url_for("manage"))
+
+
+@app.route("/plan/overage/disable")
+@login_required
+def disable_overage():
+    """Disable overage by flipping boolean"""
+    return redirect(url_for("manage"))
+
+    # if current_user.allow_overage:
+    #     current_user.allow_overage = False
+    #     current_user.save()
+    #     flash("Limit overage has been disabled")
+    # else:
+    #     flash("Limit overage is already disabled")
+    # return redirect(url_for("manage"))

@@ -7,40 +7,22 @@
 {% block content %}
 {% if new_plan.price and not (current_user.stripe and current_user.stripe.subscription_id) %}
     <h1>Plan Sign Up</h1>
-    <p>You're about to sign up for the <b>{{ new_plan.name }}</b> plan for the AVWX REST API. Click the button below to finish.</p>
-    {% if config.ENV == 'development' %}
-        <p>Since the app is in development: use the following Stripe card numbers and make up the rest:</p>
-        <ul>
-            <li>Success: 4242 4242 4242 4242</li>
-            <li>Error: 4000 0000 0000 0002</li>
-        </ul>
-        <p>Check their <a href="https://stripe.com/docs/testing#cards">documentation</a> for a full list of test credit card numbers</p>
-    {% endif %}
-    <button id="checkout-button" class="btn btn-primary">Subscribe to AVWX</button>
-    <script>
-        var stripe = Stripe("{{ stripe_key }}");
-        var checkoutButton = document.querySelector('#checkout-button');
-        checkoutButton.addEventListener('click', function () {
-            stripe.redirectToCheckout({
-                sessionId: "{{ session.id }}"
-            }).then(function (result) {
-                console.log(result.error.message);
-            });
-        });
-    </script>
+    <p>You're about to sign up for the <b>{{ new_plan.name }}</b> plan for the AVWX REST API for <b>${{ new_plan.price }} / {% if '-year' in new_plan.key %}year{% else %}month{% endif %}</b>. Click the button below to finish.</p>
+
+    {% include 'include/stripe_checkout.html' %}
 {% else %}
-<h1>Change Subscription</h1>
-<p>Are you sure you want to {% if old_plan.type == new_plan.type %}change{% elif new_plan > old_plan %}upgrade{% else %}downgrade{% endif %} your plan from <b>{{ old_plan.name }}</b> to <b>{{ new_plan.name }}</b>?</p>
-<ul>
-    <li>Your charge will change to <b>${{ new_plan.price }} / {% if '-year' in new_plan.key %}year{% else %}month{% endif %}</b></li>
-    {% if new_plan.price %}
-    <li>Your card will be charged with the new amount <b>immediately</b></li>
-    {% endif %}
-    <li>While your API token does not need to be updated, it may take up to <b>15 minutes</b> for the new plan level to update due to caching</li>
-    <li>Changing your API token now will make the change immediate</li>
-</ul>
-<form action="{{ url_for('change', plan=new_plan.key) }}" method="POST">
-    <input class="btn btn-primary" type="submit" value="Change Subscription">
-</form>
+    <h1>Change Subscription</h1>
+    <p>Are you sure you want to {% if old_plan.type == new_plan.type %}change{% elif new_plan > old_plan %}upgrade{% else %}downgrade{% endif %} your plan from <b>{{ old_plan.name }}</b> to <b>{{ new_plan.name }}</b>?</p>
+    <ul>
+        <li>Your charge will change to <b>${{ new_plan.price }} / {% if '-year' in new_plan.key %}year{% else %}month{% endif %}</b></li>
+        {% if new_plan.price %}
+        <li>Your card will be charged with the new amount <b>immediately</b></li>
+        {% endif %}
+        <li>While your API token does not need to be updated, it may take a minute for the new plan level to update due to caching</li>
+        <li>Changing your API token now will make the change immediate</li>
+    </ul>
+    <form action="{{ url_for('change', plan=new_plan.key) }}" method="POST">
+        <input class="btn btn-primary" type="submit" value="Change Subscription">
+    </form>
 {% endif %}
 {% endblock %}

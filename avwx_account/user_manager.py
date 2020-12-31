@@ -24,8 +24,10 @@ class CustomUserManager(UserManager):
 
 user_manager = CustomUserManager(app, db, User)
 
+
 class Anonymous(AnonymousUserMixin):
     """Say that anonymous users have no roles"""
+
     @staticmethod
     def has_roles(*_) -> bool:
         return False
