@@ -38,9 +38,11 @@ def get_event(payload: dict, sig: str) -> stripe.api_resources.event.Event:
     )
 
 
-def new_subscription(session: dict):
+def new_subscription(session: dict) -> bool:
     """Create a new subscription for a validated Checkout Session"""
     user = User.objects(id=session["client_reference_id"]).first()
+    if user is None:
+        return False
     user.stripe = Stripe(
         customer_id=session["customer"], subscription_id=session["subscription"]
     )
@@ -48,6 +50,7 @@ def new_subscription(session: dict):
     user.plan = Plan.by_stripe_id(plan_id).as_embedded()
     user.new_token(dev=True)
     user.save()
+    return True
 
 
 def change_subscription(plan: Plan) -> bool:

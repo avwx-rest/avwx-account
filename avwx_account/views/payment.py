@@ -33,8 +33,8 @@ def stripe_fulfill():
     except (ValueError, SignatureVerificationError):
         return "", 400
     if event["type"] == "checkout.session.completed":
-        plans.new_subscription(event["data"]["object"])
-        return "", 200
+        if plans.new_subscription(event["data"]["object"]):
+            return "", 200
     return "", 400
 
 
