@@ -69,33 +69,29 @@ def change(plan: str):
 @login_required
 def enable_overage():
     """Enable overage for a subscribed account"""
+    if current_user.allow_overage:
+        flash("Limit overage is already enabled")
+        return redirect(url_for("manage"))
+    if not current_user.has_addon("overage"):
+        if not current_user.has_subscription:
+            # return redirect(url_for("new_overage"))
+            flash("Limit overage currently requires a paid account")
+            return redirect(url_for("manage"))
+        current_user.add_addon("overage")
+    current_user.allow_overage = True
+    current_user.save()
+    flash("Limit overage has been enabled")
     return redirect(url_for("manage"))
-
-    # if current_user.allow_overage:
-    #     flash("Limit overage is already enabled")
-    #     return redirect(url_for("manage"))
-    # if not current_user.has_addon("overage"):
-    #     if not current_user.has_subscription:
-    #         # return redirect(url_for("new_overage"))
-    #         flash("Limit overage requires a paid account")
-    #         return redirect(url_for("manage"))
-    #     current_user.add_addon("overage")
-    # current_user.allow_overage = True
-    # current_user.save()
-    # flash("Limit overage has been enabled")
-    # return redirect(url_for("manage"))
 
 
 @app.route("/plan/overage/disable")
 @login_required
 def disable_overage():
     """Disable overage by flipping boolean"""
+    if current_user.allow_overage:
+        current_user.allow_overage = False
+        current_user.save()
+        flash("Limit overage has been disabled")
+    else:
+        flash("Limit overage is already disabled")
     return redirect(url_for("manage"))
-
-    # if current_user.allow_overage:
-    #     current_user.allow_overage = False
-    #     current_user.save()
-    #     flash("Limit overage has been disabled")
-    # else:
-    #     flash("Limit overage is already disabled")
-    # return redirect(url_for("manage"))

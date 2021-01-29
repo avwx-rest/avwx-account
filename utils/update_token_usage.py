@@ -20,7 +20,8 @@ def main() -> int:
             continue
         token = tokens[0]
         resp = mdb.account.token.update_many(
-            {"user_id": user["_id"]}, {"$set": {"token_id": token["_id"]}},
+            {"user_id": user["_id"]},
+            {"$set": {"token_id": token["_id"]}},
         )
         print(resp.modified_count)
     return 0

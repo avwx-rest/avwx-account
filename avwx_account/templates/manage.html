@@ -20,7 +20,7 @@
             <h3>Tokens</h3>
             <p>
                 <b>Current Plan</b>: {{ current_user.plan.name }} at <b>${{ current_user.plan.price }}</b> / {% if '-year' in current_user.plan.key %}year{% else %}month{% endif %} & <b>{{ current_user.plan.limit // 1000 }}k</b> calls / day
-                <!-- {% if current_user.has_subscription %}
+                {% if current_user.has_subscription %}
                     <br/>
                     <b>Token Limit Overage</b>:
                     {% if current_user.allow_overage %}
@@ -29,7 +29,7 @@
                     <i class="fas fa-times"></i> Disabled <a href="{{ url_for('enable_overage') }}" class="btn btn-primary" role="button"><i class="fas fa-check"></i> Enable</a>
                     {% endif %}
                     at <b>$0.08</b> per 1000 calls monthly
-                {% endif %} -->
+                {% endif %}
             </p>
             {% if current_user.tokens %}
             <table id="token-table">
