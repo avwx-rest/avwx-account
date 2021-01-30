@@ -3,7 +3,8 @@ Payment management and callback views
 """
 
 # library
-from flask import flash, redirect, render_template, request, url_for
+import stripe
+from flask import flash, redirect, request, url_for
 from flask_user import login_required, current_user
 from stripe.error import SignatureVerificationError
 
@@ -38,16 +39,29 @@ def stripe_fulfill():
     return "", 400
 
 
-@app.route("/update-card", methods=["GET", "POST"])
+# @app.route("/update-card", methods=["GET", "POST"])
+# @login_required
+# def update_card():
+#     if not current_user.stripe.customer_id:
+#         flash("You have no existing card on file", "info")
+#         return redirect(url_for("manage"))
+#     if request.method == "POST":
+#         if plans.update_card(request.form["stripeToken"]):
+#             flash("Your card has been updated", "success")
+#         else:
+#             flash("Something went wrong while updating your card", "error")
+#         return redirect(url_for("manage"))
+#     return render_template("update_card.html", stripe_key=app.config["STRIPE_PUB_KEY"])
+
+
+@app.route("/create-customer-portal-session")
 @login_required
-def update_card():
+def customer_portal():
     if not current_user.stripe.customer_id:
-        flash("You have no existing card on file", "info")
+        flash("You have no existing payment history", "info")
         return redirect(url_for("manage"))
-    if request.method == "POST":
-        if plans.update_card(request.form["stripeToken"]):
-            flash("Your card has been updated", "success")
-        else:
-            flash("Something went wrong while updating your card", "error")
-        return redirect(url_for("manage"))
-    return render_template("update_card.html", stripe_key=app.config["STRIPE_PUB_KEY"])
+    session = stripe.billing_portal.Session.create(
+        customer=current_user.stripe.customer_id,
+        return_url=app.config["ROOT_URL"] + "/manage",
+    )
+    return redirect(session.url)

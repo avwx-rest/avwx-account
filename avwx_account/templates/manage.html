@@ -12,7 +12,7 @@
                 {% if not current_user.subscribed %}<a href="{{ url_for('subscribe') }}" class="btn btn-primary" role="button"><i class="far fa-envelope"></i> Join Mailing List</a>{% endif %}
                 <a href="{{ url_for('user.edit_user_profile') }}" class="btn btn-primary" role="button"><i class="fas fa-edit"></i> Edit Account</a>
                 <a href="{{ url_for('user.change_password') }}" class="btn btn-primary" role="button"><i class="fas fa-lock"></i> Change Password</a>
-                {% if current_user.stripe.subscription_id %}<a href="{{ url_for('update_card') }}" class="btn btn-primary" role="button"><i class="fas fa-credit-card"></i> Update Card</a>{% endif %}
+                {% if current_user.stripe.customer_id %}<a href="{{ url_for('customer_portal') }}" class="btn btn-primary" role="button"><i class="fas fa-credit-card"></i> Billing and Invoices</a>{% endif %}
                 <a href="{{ url_for('delete_account') }}" class="btn btn-danger" role="button"><i class="far fa-trash-alt"></i> Delete Account</a>
             </div>
         </div>
@@ -52,7 +52,7 @@
         </div>
     </div>
     <br/>
-    <div class="row">
+    <!-- <div class="row">
         {% if invoices %}
         <div class="col-md-4 col-sm-6">
             <h3>Recent Invoices</h3>
@@ -60,6 +60,6 @@
         </div>
         {% endif %}
     </div>
-    <br/>
+    <br/> -->
     {% include 'include/plans.html' %}
 {% endblock %}

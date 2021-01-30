@@ -86,9 +86,9 @@ def cancel_subscription() -> bool:
     return True
 
 
-def update_card(token: str) -> bool:
-    """Update stored credit card based on returned Stripe token"""
-    if not current_user.stripe.customer_id:
-        return False
-    stripe.Customer.modify(current_user.stripe.customer_id, source=token)
-    return True
+# def update_card(token: str) -> bool:
+#     """Update stored credit card based on returned Stripe token"""
+#     if not current_user.stripe.customer_id:
+#         return False
+#     stripe.Customer.modify(current_user.stripe.customer_id, source=token)
+#     return True

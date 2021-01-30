@@ -27,7 +27,7 @@ def manage():
     return render_template(
         "manage.html",
         plan=current_user.plan,
-        invoices=current_user.invoices(),
+        # invoices=current_user.invoices(),
     )
 
 
