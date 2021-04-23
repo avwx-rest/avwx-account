@@ -4,6 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AVWX - Account</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/static/favicons/site.webmanifest">
+    <link rel="mask-icon" href="/static/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="theme-color" content="#ffffff">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <script src="https://kit.fontawesome.com/51107b8707.js" crossorigin="anonymous"></script>
@@ -16,8 +25,10 @@
     <nav class="container-fluid">
         <div class="row justify-content-between align-items-center">
             <div class="col">
-                <h4 class="d-inline"><a href="https://avwx.rest">AVWX</a></h4>
-                &nbsp;-&nbsp;
+                <a href="https://avwx.rest">
+                    <img src="/static/img/avwx-icon-32-white.png" alt="AVWX navigation icon">
+                </a>
+                &nbsp;
                 <h6 class="d-inline"><a href="/">Account Management</a></h6>
             </div>
             <div class="col-xs-auto">
